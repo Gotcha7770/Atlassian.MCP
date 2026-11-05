@@ -1,4 +1,7 @@
 <Solution>
   <Project Path="Atlassian.Mcp.Core/Atlassian.Mcp.Core.csproj" />
+  <Project Path="Atlassian.Mcp.Infrastructure/Atlassian.Mcp.Infrastructure.csproj" />
   <Project Path="Atlassian.MCP.Server/Atlassian.MCP.Server.csproj" />
+  <Project Path="tests/Atlassian.Mcp.Tests/Atlassian.Mcp.Tests.csproj" />
+  <Project Path="tests/Atlassian.Mcp.IntegrationTests/Atlassian.Mcp.IntegrationTests.csproj" />
 </Solution>
