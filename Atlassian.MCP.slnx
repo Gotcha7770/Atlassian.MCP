@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Atlassian.Mcp.Core/Atlassian.Mcp.Core.csproj" />
+  <Project Path="Atlassian.MCP.Server/Atlassian.MCP.Server.csproj" />
+</Solution>
