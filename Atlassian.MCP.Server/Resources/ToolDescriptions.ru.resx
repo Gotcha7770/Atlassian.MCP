@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="jira_get_issue" xml:space="preserve">
+    <value>Получить задачу Jira по ключу: тема, описание, статус, тип, проект, исполнитель, автор, приоритет, метки, даты и значения пользовательских полей.</value>
+  </data>
+  <data name="jira_search_issues" xml:space="preserve">
+    <value>Найти задачи Jira по JQL-запросу с компактной постраничной выдачей.</value>
+  </data>
+  <data name="jira_get_project" xml:space="preserve">
+    <value>Получить информацию о проекте Jira: название, ключ, тип и руководитель.</value>
+  </data>
+  <data name="confluence_search" xml:space="preserve">
+    <value>Найти страницы Confluence по CQL-запросу с постраничной выдачей.</value>
+  </data>
+  <data name="confluence_get_page" xml:space="preserve">
+    <value>Получить страницу Confluence по идентификатору вместе с содержимым в Storage Format.</value>
+  </data>
+  <data name="confluence_get_page_children" xml:space="preserve">
+    <value>Получить дочерние страницы Confluence для навигации по дереву страниц.</value>
+  </data>
+</root>

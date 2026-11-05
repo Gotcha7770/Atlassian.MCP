@@ -1,6 +1,12 @@
+using System.Globalization;
+using Atlassian.Mcp.Infrastructure;
+using Atlassian.Mcp.Infrastructure.Configuration;
+using Atlassian.MCP.Server.Localization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Spectre.Console;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -9,10 +15,25 @@ builder.Logging.AddConsole(options =>
     options.LogToStandardErrorThreshold = LogLevel.Trace;
 });
 
-builder.Services
-    .AddMcpServer()
-    .WithStdioServerTransport()
-    .WithTools<JiraTools>()
-    .WithTools<ConfluenceTools>();
+// stdout зарезервирован под MCP STDIO: любой вывод Spectre.Console идёт в stderr.
+var console = AnsiConsole.Create(new AnsiConsoleSettings
+{
+    Ansi = AnsiSupport.No,
+    ColorSystem = ColorSystemSupport.NoColors,
+    Out = new AnsiConsoleOutput(Console.Error)
+});
 
-await builder.Build().RunAsync();
+var culture = CultureInfo.GetCultureInfo(
+    AtlassianOptions.ResolveLanguage(builder.Configuration[AtlassianOptions.LanguageKey]));
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+builder.Configuration.AddInMemoryCollection(AtlassianOptions.ToSectionValues(builder.Configuration));
+
+builder.Services.AddSingleton(console);
+builder.Services.AddSingleton(new ResourceAccessor(culture.Name));
+builder.Services.AddAtlassian(builder.Configuration);
+
+var app = builder.Build();
+
+await app.RunAsync();
