@@ -37,87 +37,85 @@ public static class DependencyInjection
         TransportExceptionFactory = (_, exception, _) => exception
     };
 
-    public static IServiceCollection AddAtlassian(this IServiceCollection services, IConfiguration configuration)
+    extension(IServiceCollection services)
     {
-        ArgumentNullException.ThrowIfNull(services);
-        ArgumentNullException.ThrowIfNull(configuration);
-
-        services
-            .AddOptions<AtlassianOptions>()
-            .Bind(configuration.GetSection(AtlassianOptions.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        return services.AddAtlassianHttpClients();
-    }
-
-    public static IServiceCollection AddAtlassianHttpClients(
-        this IServiceCollection services,
-        HttpMessageHandler? jiraPrimaryHandler = null,
-        HttpMessageHandler? confluencePrimaryHandler = null)
-    {
-        ArgumentNullException.ThrowIfNull(services);
-
-        var jiraClient = services.AddRefitClient<IJiraApi>(Settings)
-            .ConfigureHttpClient((provider, client) =>
-            {
-                var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
-                client.BaseAddress = options.Value.JiraUrl.GetBaseAddress();
-                client.Timeout = HttpTimeout;
-            })
-            .AddHttpMessageHandler(_ => new ErrorHandler(AtlassianSystem.Jira, JiraErrorParser.ExtractMessage))
-            .AddHttpMessageHandler(provider =>
-            {
-                var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
-                return new BearerTokenHandler(options.Value.JiraPat);
-            })
-            .AddHttpMessageHandler(_ => new HttpRetryHandler(RetryOptions))
-            .AddHttpMessageHandler(provider =>
-            {
-                var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
-                var prefix = options.Value.JiraUrl.GetPathPrefix();
-
-                return new ContextPathHandler(prefix);
-            });
-
-        if (jiraPrimaryHandler is not null)
+        public IServiceCollection AddAtlassian(IConfiguration configuration)
         {
-            jiraClient.ConfigurePrimaryHttpMessageHandler(() => jiraPrimaryHandler);
+            ArgumentNullException.ThrowIfNull(configuration);
+
+            services
+                .AddOptions<AtlassianOptions>()
+                .Bind(configuration.GetSection(AtlassianOptions.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            return services.AddAtlassianHttpClients();
         }
 
-        var confluenceClient = services.AddRefitClient<IConfluenceApi>(Settings)
-            .ConfigureHttpClient((provider, client) =>
-            {
-                var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
-                client.BaseAddress = options.Value.ConfluenceUrl.GetBaseAddress();
-                client.Timeout = HttpTimeout;
-            })
-            .AddHttpMessageHandler(_ => new ErrorHandler(
-                AtlassianSystem.Confluence,
-                ConfluenceErrorParser.ExtractMessage))
-            .AddHttpMessageHandler(provider =>
-            {
-                var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
-                return new BearerTokenHandler(options.Value.ConfluencePat);
-            })
-            .AddHttpMessageHandler(_ => new HttpRetryHandler(RetryOptions))
-            .AddHttpMessageHandler(provider =>
-            {
-                var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
-                var prefix = options.Value.ConfluenceUrl.GetPathPrefix();
-
-                return new ContextPathHandler(prefix);
-            });
-
-        if (confluencePrimaryHandler is not null)
+        public IServiceCollection AddAtlassianHttpClients(
+            HttpMessageHandler? jiraPrimaryHandler = null,
+            HttpMessageHandler? confluencePrimaryHandler = null)
         {
-            confluenceClient.ConfigurePrimaryHttpMessageHandler(() => confluencePrimaryHandler);
+            var jiraClient = services.AddRefitClient<IJiraApi>(Settings)
+                .ConfigureHttpClient((provider, client) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
+                    client.BaseAddress = options.Value.JiraUrl.GetBaseAddress();
+                    client.Timeout = HttpTimeout;
+                })
+                .AddHttpMessageHandler(_ => new ErrorHandler(AtlassianSystem.Jira, JiraErrorParser.ExtractMessage))
+                .AddHttpMessageHandler(provider =>
+                {
+                    var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
+                    return new BearerTokenHandler(options.Value.JiraPat);
+                })
+                .AddHttpMessageHandler(_ => new HttpRetryHandler(RetryOptions))
+                .AddHttpMessageHandler(provider =>
+                {
+                    var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
+                    var prefix = options.Value.JiraUrl.GetPathPrefix();
+
+                    return new ContextPathHandler(prefix);
+                });
+
+            if (jiraPrimaryHandler is not null)
+            {
+                jiraClient.ConfigurePrimaryHttpMessageHandler(() => jiraPrimaryHandler);
+            }
+
+            var confluenceClient = services.AddRefitClient<IConfluenceApi>(Settings)
+                .ConfigureHttpClient((provider, client) =>
+                {
+                    var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
+                    client.BaseAddress = options.Value.ConfluenceUrl.GetBaseAddress();
+                    client.Timeout = HttpTimeout;
+                })
+                .AddHttpMessageHandler(_ => new ErrorHandler(
+                    AtlassianSystem.Confluence,
+                    ConfluenceErrorParser.ExtractMessage))
+                .AddHttpMessageHandler(provider =>
+                {
+                    var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
+                    return new BearerTokenHandler(options.Value.ConfluencePat);
+                })
+                .AddHttpMessageHandler(_ => new HttpRetryHandler(RetryOptions))
+                .AddHttpMessageHandler(provider =>
+                {
+                    var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
+                    var prefix = options.Value.ConfluenceUrl.GetPathPrefix();
+
+                    return new ContextPathHandler(prefix);
+                });
+
+            if (confluencePrimaryHandler is not null)
+            {
+                confluenceClient.ConfigurePrimaryHttpMessageHandler(() => confluencePrimaryHandler);
+            }
+
+            services.AddSingleton<IJiraClient, JiraClient>();
+            services.AddSingleton<IConfluenceClient, ConfluenceClient>();
+
+            return services;
         }
-
-        services.AddSingleton<IJiraClient, JiraClient>();
-        services.AddSingleton<IConfluenceClient, ConfluenceClient>();
-
-        return services;
     }
 }
-
