@@ -113,9 +113,18 @@ public static class JiraIssueMapper
 
         var customFields = additionalFields
             .Where(field => field.Key.StartsWith(CustomFieldPrefix, StringComparison.Ordinal))
-            .Where(field => field.Value.ValueKind is not JsonValueKind.Null and not JsonValueKind.Undefined)
+            .Where(field => IsMeaningful(field.Value))
             .ToDictionary(field => field.Key, field => field.Value);
 
         return customFields.Count == 0 ? null : customFields;
     }
+
+    private static bool IsMeaningful(JsonElement value) =>
+        value.ValueKind switch
+        {
+            JsonValueKind.Null or JsonValueKind.Undefined => false,
+            JsonValueKind.Array => value.GetArrayLength() > 0,
+            JsonValueKind.Object => value.EnumerateObject().Any(),
+            _ => true
+        };
 }

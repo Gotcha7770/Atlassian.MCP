@@ -19,9 +19,10 @@ public static class ResponseLimiter
     public const int MaxCustomFieldsBytes = 32 * 1024;
 
     /// <summary>
-    /// Максимальное количество пользовательских полей в ответе.
+    /// Общий предел элементов для связей, подзадач и пользовательских полей в ответе.
+    /// Элементы распределяются по приоритету: `links` → `subtasks` → `customFields`.
     /// </summary>
-    public const int MaxCustomFields = 100;
+    public const int MaxItems = 100;
 
     public static int GetUtf8Length(string value) => Encoding.UTF8.GetByteCount(value);
 }

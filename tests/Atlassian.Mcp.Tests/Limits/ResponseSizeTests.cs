@@ -72,7 +72,7 @@ public sealed class ResponseSizeTests
     {
         var customFields = new Dictionary<string, JsonElement>();
 
-        for (var index = 0; index <= ResponseLimiter.MaxCustomFields; index++)
+        for (var index = 0; index <= ResponseLimiter.MaxItems; index++)
         {
             customFields[$"customfield_{index}"] = JsonDocument.Parse("1").RootElement;
         }
@@ -83,9 +83,55 @@ public sealed class ResponseSizeTests
             CustomFields = customFields
         });
 
-        details.CustomFields.Should().HaveCount(ResponseLimiter.MaxCustomFields);
+        details.CustomFields.Should().HaveCount(ResponseLimiter.MaxItems);
         details.Truncation.Should().NotBeNull();
         details.Truncation!.Field.Should().Be("customFields");
+    }
+
+    [Fact]
+    public void Shares_item_limit_between_custom_fields_links_and_subtasks()
+    {
+        var customFields = new Dictionary<string, JsonElement>();
+
+        for (var index = 0; index < 30; index++)
+        {
+            customFields[$"customfield_{index}"] = JsonDocument.Parse("1").RootElement;
+        }
+
+        var links = Enumerable
+            .Range(0, 60)
+            .Select(index => new JiraIssueLink
+            {
+                Type = "Blocks",
+                Direction = "outward",
+                Key = $"PROJ-{index}"
+            })
+            .ToList();
+
+        var subtasks = Enumerable
+            .Range(0, 60)
+            .Select(index => new JiraSubtask
+            {
+                Key = $"PROJ-{index}"
+            })
+            .ToList();
+
+        var details = JiraIssueDetailsLimiter.Limit(new JiraIssueDetails
+        {
+            Key = "PROJ-123",
+            CustomFields = customFields,
+            Links = links,
+            Subtasks = subtasks
+        });
+
+        details.CustomFields.Should().BeNull();
+        details.Links.Should().HaveCount(60);
+        details.Subtasks.Should().HaveCount(40);
+        details.Truncated.Should().BeTrue();
+        details.Truncation.Should().NotBeNull();
+        details.Truncation!.Field.Should().Be("subtasks");
+        details.Truncation.OriginalLength.Should().Be(subtasks.Count);
+        details.Truncation.AppliedLength.Should().Be(40);
     }
 
     [Fact]

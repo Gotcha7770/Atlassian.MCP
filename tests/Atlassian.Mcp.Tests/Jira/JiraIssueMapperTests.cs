@@ -171,6 +171,8 @@ public sealed class JiraIssueMapperTests
             "customfield_10101": { "value": "Backend" },
             "customfield_10202": 3,
             "customfield_10303": null,
+            "customfield_10404": [],
+            "customfield_10505": {},
             "workratio": 42
           }
         }
@@ -184,6 +186,8 @@ public sealed class JiraIssueMapperTests
         details.CustomFields!.Should().ContainKeys("customfield_10101", "customfield_10202");
         details.CustomFields.Should().NotContainKey("workratio");
         details.CustomFields.Should().NotContainKey("customfield_10303");
+        details.CustomFields.Should().NotContainKey("customfield_10404");
+        details.CustomFields.Should().NotContainKey("customfield_10505");
         details.CustomFields["customfield_10101"].GetProperty("value").GetString().Should().Be("Backend");
         details.CustomFields["customfield_10202"].GetInt32().Should().Be(3);
     }

@@ -14,8 +14,18 @@ public static class JiraIssueDetailsLimiter
     public static JiraIssueDetails Limit(JiraIssueDetails issue)
     {
         var description = LimitDescription(issue.Description);
-        var customFields = LimitCustomFields(issue.CustomFields);
-        var truncation = description.Truncation ?? customFields.Truncation;
+        var links = LimitCollection(issue.Links, "links", ResponseLimiter.MaxItems);
+        var usedByLinks = links.Value?.Count ?? 0;
+        var subtasks = LimitCollection(issue.Subtasks, "subtasks", ResponseLimiter.MaxItems - usedByLinks);
+        var usedByCollections = usedByLinks + (subtasks.Value?.Count ?? 0);
+        var customFields = LimitCustomFields(
+            issue.CustomFields,
+            ResponseLimiter.MaxItems - usedByCollections);
+
+        var truncation = description.Truncation
+            ?? links.Truncation
+            ?? subtasks.Truncation
+            ?? customFields.Truncation;
 
         if (truncation is null)
         {
@@ -26,6 +36,8 @@ public static class JiraIssueDetailsLimiter
         {
             Description = description.Value,
             CustomFields = customFields.Value,
+            Links = links.Value,
+            Subtasks = subtasks.Value,
             Truncated = true,
             Truncation = truncation
         };
@@ -61,7 +73,8 @@ public static class JiraIssueDetailsLimiter
     /// одно большое поле не отбрасывает следующие за ним.
     /// </summary>
     private static Limited<Dictionary<string, JsonElement>?> LimitCustomFields(
-        Dictionary<string, JsonElement>? customFields)
+        Dictionary<string, JsonElement>? customFields,
+        int maxItems)
     {
         if (customFields is not { Count: > 0 })
         {
@@ -73,7 +86,7 @@ public static class JiraIssueDetailsLimiter
 
         foreach (var field in customFields)
         {
-            if (kept.Count == ResponseLimiter.MaxCustomFields)
+            if (kept.Count == maxItems)
             {
                 break;
             }
@@ -102,6 +115,29 @@ public static class JiraIssueDetailsLimiter
         };
 
         return new Limited<Dictionary<string, JsonElement>?>(kept.Count == 0 ? null : kept, truncation);
+    }
+
+    /// <summary>
+    /// Оставляет первые <paramref name="maxItems"/> элементов коллекции.
+    /// </summary>
+    private static Limited<IReadOnlyList<T>?> LimitCollection<T>(
+        IReadOnlyList<T>? items,
+        string field,
+        int maxItems)
+    {
+        if (items is null || items.Count <= maxItems)
+        {
+            return new(items, null);
+        }
+
+        var truncation = new TruncationInfo
+        {
+            Field = field,
+            OriginalLength = items.Count,
+            AppliedLength = Math.Max(maxItems, 0)
+        };
+
+        return new(maxItems <= 0 ? null : items.Take(maxItems).ToList(), truncation);
     }
 
     /// <summary>
