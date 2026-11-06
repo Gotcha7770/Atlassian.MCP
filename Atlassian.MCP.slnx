@@ -6,4 +6,11 @@
     <Project Path="tests/Atlassian.Mcp.Tests/Atlassian.Mcp.Tests.csproj" />
     <Project Path="tests/Atlassian.Mcp.IntegrationTests/Atlassian.Mcp.IntegrationTests.csproj" />
   </Folder>
+  <Folder Name="/SolutionItems/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="AGENTS.md" />
+    <File Path="opencode.json" />
+    <File Path="README.md" />
+  </Folder>
 </Solution>
