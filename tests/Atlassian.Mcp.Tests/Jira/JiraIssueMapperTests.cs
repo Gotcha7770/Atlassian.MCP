@@ -46,7 +46,7 @@ public sealed class JiraIssueMapperTests
     }
 
     [Fact]
-    public void Keeps_custom_and_unknown_fields()
+    public void Keeps_only_custom_fields()
     {
         const string body = """
         {
@@ -55,6 +55,7 @@ public sealed class JiraIssueMapperTests
             "summary": "CSV export",
             "customfield_10101": { "value": "Backend" },
             "customfield_10202": 3,
+            "customfield_10303": null,
             "workratio": 42
           }
         }
@@ -65,7 +66,9 @@ public sealed class JiraIssueMapperTests
         var details = JiraIssueMapper.ToDetails(issue!);
 
         details.CustomFields.Should().NotBeNull();
-        details.CustomFields!.Should().ContainKeys("customfield_10101", "customfield_10202", "workratio");
+        details.CustomFields!.Should().ContainKeys("customfield_10101", "customfield_10202");
+        details.CustomFields.Should().NotContainKey("workratio");
+        details.CustomFields.Should().NotContainKey("customfield_10303");
         details.CustomFields["customfield_10101"].GetProperty("value").GetString().Should().Be("Backend");
         details.CustomFields["customfield_10202"].GetInt32().Should().Be(3);
     }
