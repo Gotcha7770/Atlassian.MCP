@@ -21,4 +21,13 @@
   <data name="UnsupportedLanguage" xml:space="preserve">
     <value>Unsupported language '{0}'. Supported values: en, ru.</value>
   </data>
+  <data name="NetworkError" xml:space="preserve">
+    <value>network error</value>
+  </data>
+  <data name="TimeoutExceeded" xml:space="preserve">
+    <value>timeout exceeded</value>
+  </data>
+  <data name="EmptyResponse" xml:space="preserve">
+    <value>empty response for the issue</value>
+  </data>
 </root>

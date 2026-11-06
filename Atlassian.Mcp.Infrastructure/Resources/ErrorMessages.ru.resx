@@ -21,4 +21,13 @@
   <data name="UnsupportedLanguage" xml:space="preserve">
     <value>Неподдерживаемый язык '{0}'. Допустимые значения: en, ru.</value>
   </data>
+  <data name="NetworkError" xml:space="preserve">
+    <value>сетевая ошибка</value>
+  </data>
+  <data name="TimeoutExceeded" xml:space="preserve">
+    <value>превышено время ожидания</value>
+  </data>
+  <data name="EmptyResponse" xml:space="preserve">
+    <value>пустой ответ для задачи</value>
+  </data>
 </root>

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Atlassian.Mcp.Core.Contracts;
 using Atlassian.Mcp.Core.Models.Jira;
+using Atlassian.MCP.Server.Resources;
 using ModelContextProtocol;
 using ModelContextProtocol.Server;
 
@@ -25,7 +26,7 @@ public sealed class JiraTools
     {
         if (string.IsNullOrWhiteSpace(issueKey))
         {
-            throw new McpException("issueKey is required.");
+            throw new McpException(ToolMessages.IssueKeyRequired);
         }
 
         var issue = await _client.GetIssueAsync(issueKey, fields, cancellationToken);

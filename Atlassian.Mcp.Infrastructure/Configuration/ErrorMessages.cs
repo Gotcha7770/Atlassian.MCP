@@ -20,6 +20,12 @@ public static class ErrorMessages
 
     public static string UnsupportedLanguage => Get("UnsupportedLanguage");
 
+    public static string NetworkError => Get("NetworkError");
+
+    public static string TimeoutExceeded => Get("TimeoutExceeded");
+
+    public static string EmptyResponse => Get("EmptyResponse");
+
     public static string Format(string template, params object?[] arguments)
     {
         return string.Format(CultureInfo.CurrentUICulture, template, arguments);

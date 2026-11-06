@@ -1,5 +1,6 @@
 using System.Text;
 using Atlassian.Mcp.Core.Errors;
+using Atlassian.Mcp.Infrastructure.Configuration;
 
 namespace Atlassian.Mcp.Infrastructure.Http;
 
@@ -43,7 +44,7 @@ public class ErrorHandler : DelegatingHandler
             throw new AtlassianApiException(
                 _system,
                 null,
-                $"{_system}: network error",
+                $"{_system}: {ErrorMessages.NetworkError}",
                 null,
                 exception);
         }
@@ -52,7 +53,7 @@ public class ErrorHandler : DelegatingHandler
             throw new AtlassianApiException(
                 _system,
                 null,
-                $"{_system}: timeout exceeded",
+                $"{_system}: {ErrorMessages.TimeoutExceeded}",
                 null,
                 exception);
         }

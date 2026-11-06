@@ -1,6 +1,7 @@
 using Atlassian.Mcp.Core.Contracts;
 using Atlassian.Mcp.Core.Errors;
 using Atlassian.Mcp.Core.Models.Jira;
+using Atlassian.Mcp.Infrastructure.Configuration;
 using Atlassian.Mcp.Infrastructure.Jira.Models;
 using Microsoft.Extensions.Logging;
 
@@ -89,7 +90,7 @@ public sealed class JiraClient : IJiraClient
             throw new AtlassianApiException(
                 AtlassianSystem.Jira,
                 null,
-                "Jira returned an empty response for the issue.");
+                $"{AtlassianSystem.Jira}: {ErrorMessages.EmptyResponse}");
         }
 
         return JiraIssueMapper.ToDetails(issue);
