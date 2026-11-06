@@ -1,4 +1,5 @@
 using System.Globalization;
+using Atlassian.Mcp.Core.Errors;
 using Atlassian.Mcp.Infrastructure;
 using Atlassian.Mcp.Infrastructure.Configuration;
 using Atlassian.MCP.Server.Tools;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ModelContextProtocol;
 using Spectre.Console;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -36,7 +38,19 @@ builder.Services.AddAtlassian(builder.Configuration);
 builder.Services
     .AddMcpServer()
     .WithStdioServerTransport()
-    .WithTools<JiraTools>();
+    .WithTools<JiraTools>()
+    .WithRequestFilters(filters => filters.AddCallToolFilter(next =>
+        async (context, cancellationToken) =>
+        {
+            try
+            {
+                return await next(context, cancellationToken);
+            }
+            catch (AtlassianApiException exception)
+            {
+                throw new McpException(exception.Message, exception);
+            }
+        }));
 
 var app = builder.Build();
 
