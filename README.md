@@ -67,6 +67,55 @@ console.
 }
 ```
 
+## Installing from a local feed
+
+The server is packed as a .NET tool and can be distributed through a local NuGet feed.
+The .NET 10 runtime is a prerequisite.
+
+Pack the tool from the repository root:
+
+```powershell
+dotnet pack Atlassian.MCP.Server -c Release -o artifacts
+```
+
+Register the feed once, so that `dotnet tool` can see the package:
+
+```powershell
+dotnet nuget add source <path-to-repo>\artifacts -n atlassian-mcp
+```
+
+Install or update the tool:
+
+```powershell
+dotnet tool install -g Atlassian.MCP.Server
+dotnet tool update -g Atlassian.MCP.Server
+```
+
+The `atlassian-mcp` command becomes available on `PATH`. Several versions can live in the
+same feed: `dotnet tool install` picks the latest, and `--version` pins a specific one.
+
+MCP client configuration then runs the installed command instead of the project:
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "atlassian": {
+        "type": "local",
+        "command": ["atlassian-mcp"],
+        "environment": {
+          "ATLASSIAN_JIRA_URL": "https://jira.example.com/jira",
+          "ATLASSIAN_JIRA_PAT": "<jira-pat>",
+          "ATLASSIAN_CONFLUENCE_URL": "https://confluence.example.com/wiki",
+          "ATLASSIAN_CONFLUENCE_PAT": "<confluence-pat>"
+        },
+        "enabled": true
+      }
+    }
+  }
+}
+```
+
 ## Tools
 
 | Tool | Status |

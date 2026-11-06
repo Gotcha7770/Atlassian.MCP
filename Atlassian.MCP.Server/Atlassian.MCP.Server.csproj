@@ -7,6 +7,13 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>atlassian-mcp</ToolCommandName>
+        <PackageId>Atlassian.MCP.Server</PackageId>
+        <Version>0.1.0</Version>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.14" />
       <PackageReference Include="ModelContextProtocol" Version="2.3.1" />
