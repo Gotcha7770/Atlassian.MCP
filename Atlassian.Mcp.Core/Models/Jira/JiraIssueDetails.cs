@@ -34,6 +34,10 @@ public sealed record JiraIssueDetails
 
     public string[]? Labels { get; init; }
 
+    public IReadOnlyList<JiraSubtask>? Subtasks { get; init; }
+
+    public IReadOnlyList<JiraIssueLink>? Links { get; init; }
+
     public Dictionary<string, JsonElement>? CustomFields { get; init; }
 
     public bool Truncated { get; init; }

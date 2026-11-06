@@ -46,6 +46,95 @@ public sealed class JiraIssueMapperTests
     }
 
     [Fact]
+    public void Maps_subtasks()
+    {
+        const string body = """
+        {
+          "key": "PROJ-123",
+          "fields": {
+            "summary": "CSV export",
+            "subtasks": [
+              {
+                "id": "10962",
+                "key": "PROJ-94",
+                "fields": {
+                  "summary": "Create endpoint",
+                  "status": { "name": "Done" }
+                }
+              }
+            ]
+          }
+        }
+        """;
+
+        var issue = JsonSerializer.Deserialize<JiraIssue>(body, JsonSerializerOptions.Web);
+
+        var details = JiraIssueMapper.ToDetails(issue!);
+
+        details.Subtasks.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Satisfy<Atlassian.Mcp.Core.Models.Jira.JiraSubtask>(subtask =>
+            {
+                subtask.Key.Should().Be("PROJ-94");
+                subtask.Summary.Should().Be("Create endpoint");
+                subtask.Status.Should().Be("Done");
+            });
+    }
+
+    [Fact]
+    public void Maps_only_blocking_links()
+    {
+        const string body = """
+        {
+          "key": "PROJ-123",
+          "fields": {
+            "summary": "CSV export",
+            "issuelinks": [
+              {
+                "type": { "name": "Blocks", "inward": "is blocked by", "outward": "blocks" },
+                "outwardIssue": {
+                  "key": "PROJ-200",
+                  "fields": { "summary": "Release", "status": { "name": "To Do" } }
+                }
+              },
+              {
+                "type": { "name": "Blocks", "inward": "is blocked by", "outward": "blocks" },
+                "inwardIssue": {
+                  "key": "PROJ-100",
+                  "fields": { "summary": "Design", "status": { "name": "Done" } }
+                }
+              },
+              {
+                "type": { "name": "Relates", "inward": "relates to", "outward": "relates to" },
+                "outwardIssue": {
+                  "key": "PROJ-300",
+                  "fields": { "summary": "Unrelated", "status": { "name": "To Do" } }
+                }
+              }
+            ]
+          }
+        }
+        """;
+
+        var issue = JsonSerializer.Deserialize<JiraIssue>(body, JsonSerializerOptions.Web);
+
+        var details = JiraIssueMapper.ToDetails(issue!);
+
+        details.Links.Should().HaveCount(2);
+        details.Links!.Should().NotContain(link => link.Key == "PROJ-300");
+
+        var outward = details.Links.Single(link => link.Direction == "outward");
+        outward.Type.Should().Be("Blocks");
+        outward.Key.Should().Be("PROJ-200");
+        outward.Summary.Should().Be("Release");
+        outward.Status.Should().Be("To Do");
+
+        var inward = details.Links.Single(link => link.Direction == "inward");
+        inward.Key.Should().Be("PROJ-100");
+    }
+
+    [Fact]
     public void Keeps_only_custom_fields()
     {
         const string body = """

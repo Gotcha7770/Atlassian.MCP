@@ -1,6 +1,10 @@
 using System.Text.Json;
 using Atlassian.Mcp.Core.Models.Jira;
 using Atlassian.Mcp.Infrastructure.Jira.Models;
+using CoreIssueLink = Atlassian.Mcp.Core.Models.Jira.JiraIssueLink;
+using CoreSubtask = Atlassian.Mcp.Core.Models.Jira.JiraSubtask;
+using InfraIssueLink = Atlassian.Mcp.Infrastructure.Jira.Models.JiraIssueLink;
+using InfraSubtask = Atlassian.Mcp.Infrastructure.Jira.Models.JiraSubtask;
 
 namespace Atlassian.Mcp.Infrastructure.Jira;
 
@@ -30,9 +34,74 @@ public static class JiraIssueMapper
             Created = fields?.Created,
             Updated = fields?.Updated,
             Labels = fields?.Labels,
+            Subtasks = MapSubtasks(fields?.Subtasks),
+            Links = MapBlockingLinks(fields?.IssueLinks),
             CustomFields = ExtractCustomFields(fields?.AdditionalFields)
         };
     }
+
+    private static CoreSubtask[]? MapSubtasks(InfraSubtask[]? subtasks)
+    {
+        if (subtasks is null)
+        {
+            return null;
+        }
+
+        var mapped = subtasks
+            .Where(subtask => !string.IsNullOrWhiteSpace(subtask.Key))
+            .Select(subtask => new CoreSubtask
+            {
+                Key = subtask.Key!,
+                Summary = subtask.Fields?.Summary,
+                Status = subtask.Fields?.Status?.Name
+            })
+            .ToArray();
+
+        return mapped.Length == 0 ? null : mapped;
+    }
+
+    private static CoreIssueLink[]? MapBlockingLinks(InfraIssueLink[]? links)
+    {
+        if (links is null)
+        {
+            return null;
+        }
+
+        var mapped = new List<CoreIssueLink>();
+
+        foreach (var link in links)
+        {
+            if (!IsBlocking(link.Type))
+            {
+                continue;
+            }
+
+            var (direction, issue) = link.OutwardIssue is not null
+                ? ("outward", link.OutwardIssue)
+                : ("inward", link.InwardIssue);
+
+            if (issue?.Key is null)
+            {
+                continue;
+            }
+
+            mapped.Add(new CoreIssueLink
+            {
+                Type = link.Type!.Name!,
+                Direction = direction,
+                Key = issue.Key,
+                Summary = issue.Fields?.Summary,
+                Status = issue.Fields?.Status?.Name
+            });
+        }
+
+        return mapped.Count == 0 ? null : mapped.ToArray();
+    }
+
+    private static bool IsBlocking(JiraLinkType? type) =>
+        type?.Name is { } name
+        && (name.Contains("block", StringComparison.OrdinalIgnoreCase)
+            || name.Contains("блок", StringComparison.OrdinalIgnoreCase));
 
     private static Dictionary<string, JsonElement>? ExtractCustomFields(
         Dictionary<string, JsonElement>? additionalFields)

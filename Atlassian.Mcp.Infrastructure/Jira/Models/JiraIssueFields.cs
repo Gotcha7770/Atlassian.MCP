@@ -30,6 +30,10 @@ public sealed record JiraIssueFields
 
     public string[]? Labels { get; init; }
 
+    public JiraSubtask[]? Subtasks { get; init; }
+
+    public JiraIssueLink[]? IssueLinks { get; init; }
+
     /// <summary>
     /// Все поля, не описанные типизированными свойствами: пользовательские
     /// (<c>customfield_*</c>) и неизвестные стандартные.
