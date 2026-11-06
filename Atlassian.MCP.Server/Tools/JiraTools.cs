@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using Atlassian.Mcp.Core.Common;
 using Atlassian.Mcp.Core.Contracts;
 using Atlassian.Mcp.Core.Models.Jira;
 using ModelContextProtocol;
@@ -30,14 +29,8 @@ public sealed class JiraTools
         }
 
         var issue = await _client.GetIssueAsync(issueKey, fields, cancellationToken);
-        var description = ResponseLimiter.TruncateText(issue.Description, "description", out var truncation);
 
-        return issue with
-        {
-            Description = description,
-            Truncated = truncation is not null,
-            Truncation = truncation
-        };
+        return JiraIssueDetailsLimiter.Limit(issue);
     }
 }
 

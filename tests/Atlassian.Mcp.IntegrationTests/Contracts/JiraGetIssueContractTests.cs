@@ -38,12 +38,12 @@ public sealed class JiraGetIssueContractTests
     [Fact]
     public async Task Truncates_long_description()
     {
-        var description = new string('x', ResponseLimiter.MaxTextLength + 100);
+        var description = new string('x', ResponseLimiter.MaxTextBytes + 100);
         var tools = new JiraTools(new StubJiraClient { Description = description });
 
         var issue = await tools.GetIssue("PROJ-123", null, TestContext.Current.CancellationToken);
 
-        issue.Description.Should().HaveLength(ResponseLimiter.MaxTextLength);
+        issue.Description.Should().HaveLength(ResponseLimiter.MaxTextBytes);
         issue.Truncated.Should().BeTrue();
         issue.Truncation.Should().NotBeNull();
         issue.Truncation!.Field.Should().Be("description");

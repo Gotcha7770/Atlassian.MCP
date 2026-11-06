@@ -1,40 +1,27 @@
 using System.Text;
-using Atlassian.Mcp.Core.Models.Common;
 
 namespace Atlassian.Mcp.Core.Common;
 
 /// <summary>
-/// Ограничения объёма ответа инструментов MCP.
+/// Бюджеты объёма ответа инструментов MCP. Ответ ограничивается не измерением
+/// сериализованного объекта, а бюджетами отдельных частей.
 /// </summary>
 public static class ResponseLimiter
 {
-    public const int MaxResponseBytes = 64 * 1024;
-
-    public const int MaxTextLength = 16 * 1024;
+    /// <summary>
+    /// Бюджет текстового значения (описание задачи, тело страницы) в байтах UTF-8.
+    /// </summary>
+    public const int MaxTextBytes = 16 * 1024;
 
     /// <summary>
-    /// Усекает длинный текст до <see cref="MaxTextLength"/> символов.
+    /// Суммарный бюджет пользовательских полей Jira в байтах UTF-8.
     /// </summary>
-    public static string? TruncateText(string? value, string fieldName, out TruncationInfo? truncation)
-    {
-        truncation = null;
+    public const int MaxCustomFieldsBytes = 32 * 1024;
 
-        if (value is null || value.Length <= MaxTextLength)
-        {
-            return value;
-        }
+    /// <summary>
+    /// Максимальное количество пользовательских полей в ответе.
+    /// </summary>
+    public const int MaxCustomFields = 100;
 
-        truncation = new TruncationInfo
-        {
-            Field = fieldName,
-            OriginalLength = value.Length,
-            AppliedLength = MaxTextLength
-        };
-
-        return value[..MaxTextLength];
-    }
-
-    public static int GetUtf8Length(string json) => Encoding.UTF8.GetByteCount(json);
-
-    public static bool IsWithinLimit(string json) => GetUtf8Length(json) <= MaxResponseBytes;
+    public static int GetUtf8Length(string value) => Encoding.UTF8.GetByteCount(value);
 }
