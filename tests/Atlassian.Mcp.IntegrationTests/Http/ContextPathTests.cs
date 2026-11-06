@@ -3,98 +3,85 @@ using Atlassian.Mcp.Infrastructure;
 using Atlassian.Mcp.Infrastructure.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using WireMock.RequestBuilders;
-using WireMock.ResponseBuilders;
-using WireMock.Server;
+using RichardSzalay.MockHttp;
 
 namespace Atlassian.Mcp.IntegrationTests.Http;
 
-public sealed class ContextPathTests : IDisposable
+public sealed class ContextPathTests
 {
-    private readonly WireMockServer _server = WireMockServer.Start();
-
     [Fact]
     public async Task Jira_request_keeps_context_path()
     {
-        _server
-            .Given(Request.Create().WithPath("/jira/rest/api/2/myself").UsingGet())
-            .RespondWith(Response.Create().WithStatusCode(200).WithBodyAsJson(new { name = "tester" }));
+        var mock = new MockHttpMessageHandler();
+        var request = mock
+            .When("https://jira.example.com/jira/rest/api/2/myself")
+            .Respond("application/json", """{"name":"tester"}""");
 
-        await using var provider = BuildProvider(jiraPath: "/jira", confluencePath: "/wiki");
+        await using var provider = BuildProvider(jiraHandler: mock);
+        var client = provider.GetRequiredService<IJiraClient>();
 
-        await provider.GetRequiredService<IJiraClient>().CheckAvailabilityAsync(TestContext.Current.CancellationToken);
+        await client.CheckAvailabilityAsync(TestContext.Current.CancellationToken);
 
-        _server.LogEntries.Should()
-            .ContainSingle()
-            .Which.RequestMessage!.Path.Should()
-            .Be("/jira/rest/api/2/myself");
+        mock.GetMatchCount(request).Should().Be(1);
     }
 
     [Fact]
     public async Task Confluence_request_keeps_context_path()
     {
-        _server
-            .Given(Request.Create().WithPath("/wiki/rest/api/user/current").UsingGet())
-            .RespondWith(Response.Create().WithStatusCode(200).WithBodyAsJson(new { username = "tester" }));
+        var mock = new MockHttpMessageHandler();
+        var request = mock
+            .When("https://confluence.example.com/wiki/rest/api/user/current")
+            .Respond("application/json", """{"username":"tester"}""");
 
-        await using var provider = BuildProvider(jiraPath: "/jira", confluencePath: "/wiki");
+        await using var provider = BuildProvider(confluenceHandler: mock);
+        var client = provider.GetRequiredService<IConfluenceClient>();
 
-        await provider.GetRequiredService<IConfluenceClient>().CheckAvailabilityAsync(TestContext.Current.CancellationToken);
+        await client.CheckAvailabilityAsync(TestContext.Current.CancellationToken);
 
-        _server.LogEntries.Should()
-            .ContainSingle()
-            .Which.RequestMessage!.Path.Should()
-            .Be("/wiki/rest/api/user/current");
+        mock.GetMatchCount(request).Should().Be(1);
     }
 
     [Fact]
     public async Task Each_system_uses_its_own_token()
     {
-        _server
-            .Given(Request.Create().WithPath("/jira/rest/api/2/myself").UsingGet())
-            .RespondWith(Response.Create().WithStatusCode(200).WithBodyAsJson(new { name = "tester" }));
-        _server
-            .Given(Request.Create().WithPath("/wiki/rest/api/user/current").UsingGet())
-            .RespondWith(Response.Create().WithStatusCode(200).WithBodyAsJson(new { username = "tester" }));
+        var mock = new MockHttpMessageHandler();
+        var jiraRequest = mock
+            .When("https://jira.example.com/jira/rest/api/2/myself")
+            .WithHeaders("Authorization", "Bearer jira-token")
+            .Respond("application/json", """{"name":"tester"}""");
+        var confluenceRequest = mock
+            .When("https://confluence.example.com/wiki/rest/api/user/current")
+            .WithHeaders("Authorization", "Bearer confluence-token")
+            .Respond("application/json", """{"username":"tester"}""");
 
-        await using var provider = BuildProvider(jiraPath: "/jira", confluencePath: "/wiki");
+        await using var provider = BuildProvider(jiraHandler: mock, confluenceHandler: mock);
 
         await provider.GetRequiredService<IJiraClient>().CheckAvailabilityAsync(TestContext.Current.CancellationToken);
         await provider.GetRequiredService<IConfluenceClient>().CheckAvailabilityAsync(TestContext.Current.CancellationToken);
 
-        var entries = _server.LogEntries.ToList();
-
-        entries.Should().HaveCount(2);
-
-        entries[0].RequestMessage!.Headers!["Authorization"].Should()
-            .ContainSingle()
-            .Which.Should().Be("Bearer jira-token");
-
-        entries[1].RequestMessage!.Headers!["Authorization"].Should()
-            .ContainSingle()
-            .Which.Should().Be("Bearer confluence-token");
+        mock.GetMatchCount(jiraRequest).Should().Be(1);
+        mock.GetMatchCount(confluenceRequest).Should().Be(1);
     }
 
-    public void Dispose() => _server.Stop();
-
-    private ServiceProvider BuildProvider(string jiraPath, string confluencePath)
+    private static ServiceProvider BuildProvider(
+        HttpMessageHandler? jiraHandler = null,
+        HttpMessageHandler? confluenceHandler = null)
     {
         var options = new AtlassianOptions
         {
-            JiraUrl = new Uri(_server.Url! + jiraPath),
+            JiraUrl = new Uri("https://jira.example.com/jira"),
             JiraPat = "jira-token",
-            ConfluenceUrl = new Uri(_server.Url! + confluencePath),
+            ConfluenceUrl = new Uri("https://confluence.example.com/wiki"),
             ConfluencePat = "confluence-token"
         };
 
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSingleton(Options.Create(options));
-        services.AddAtlassianHttpClients();
+        services.AddSingleton<IOptions<AtlassianOptions>>(Options.Create(options));
+        services.AddAtlassianHttpClients(jiraHandler, confluenceHandler);
 
         return services.BuildServiceProvider();
     }
 }
-
 
 

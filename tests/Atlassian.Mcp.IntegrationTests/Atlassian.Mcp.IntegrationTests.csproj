@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
-        <PackageReference Include="WireMock.Net" Version="2.21.0" />
+        <PackageReference Include="RichardSzalay.MockHttp" Version="7.1.0" />
         <PackageReference Include="xunit.v3" Version="4.0.2" />
     </ItemGroup>
 
@@ -25,3 +25,4 @@
     </ItemGroup>
 
 </Project>
+

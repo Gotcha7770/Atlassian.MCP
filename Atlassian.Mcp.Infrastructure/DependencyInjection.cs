@@ -51,11 +51,14 @@ public static class DependencyInjection
         return services.AddAtlassianHttpClients();
     }
 
-    public static IServiceCollection AddAtlassianHttpClients(this IServiceCollection services)
+    public static IServiceCollection AddAtlassianHttpClients(
+        this IServiceCollection services,
+        HttpMessageHandler? jiraPrimaryHandler = null,
+        HttpMessageHandler? confluencePrimaryHandler = null)
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        services.AddRefitClient<IJiraApi>(Settings)
+        var jiraClient = services.AddRefitClient<IJiraApi>(Settings)
             .ConfigureHttpClient((provider, client) =>
             {
                 var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
@@ -77,7 +80,12 @@ public static class DependencyInjection
                 return new ContextPathHandler(prefix);
             });
 
-        services.AddRefitClient<IConfluenceApi>(Settings)
+        if (jiraPrimaryHandler is not null)
+        {
+            jiraClient.ConfigurePrimaryHttpMessageHandler(() => jiraPrimaryHandler);
+        }
+
+        var confluenceClient = services.AddRefitClient<IConfluenceApi>(Settings)
             .ConfigureHttpClient((provider, client) =>
             {
                 var options = provider.GetRequiredService<IOptions<AtlassianOptions>>();
@@ -100,6 +108,11 @@ public static class DependencyInjection
 
                 return new ContextPathHandler(prefix);
             });
+
+        if (confluencePrimaryHandler is not null)
+        {
+            confluenceClient.ConfigurePrimaryHttpMessageHandler(() => confluencePrimaryHandler);
+        }
 
         services.AddSingleton<IJiraClient, JiraClient>();
         services.AddSingleton<IConfluenceClient, ConfluenceClient>();
