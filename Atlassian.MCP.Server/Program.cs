@@ -1,7 +1,7 @@
 using System.Globalization;
 using Atlassian.Mcp.Infrastructure;
 using Atlassian.Mcp.Infrastructure.Configuration;
-using Atlassian.MCP.Server.Localization;
+using Atlassian.MCP.Server.Tools;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,8 +31,12 @@ CultureInfo.DefaultThreadCurrentUICulture = culture;
 builder.Configuration.AddInMemoryCollection(AtlassianOptions.ToSectionValues(builder.Configuration));
 
 builder.Services.AddSingleton(console);
-builder.Services.AddSingleton(new ResourceAccessor(culture.Name));
 builder.Services.AddAtlassian(builder.Configuration);
+
+builder.Services
+    .AddMcpServer()
+    .WithStdioServerTransport()
+    .WithTools<JiraTools>();
 
 var app = builder.Build();
 

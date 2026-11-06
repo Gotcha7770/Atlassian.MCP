@@ -43,7 +43,7 @@ public class ErrorHandler : DelegatingHandler
             throw new AtlassianApiException(
                 _system,
                 null,
-                $"{_system} request failed: network error.",
+                $"{_system}: network error",
                 null,
                 exception);
         }
@@ -52,7 +52,7 @@ public class ErrorHandler : DelegatingHandler
             throw new AtlassianApiException(
                 _system,
                 null,
-                $"{_system} request failed: timeout exceeded.",
+                $"{_system}: timeout exceeded",
                 null,
                 exception);
         }
@@ -63,12 +63,14 @@ public class ErrorHandler : DelegatingHandler
         CancellationToken cancellationToken)
     {
         var body = await ReadBodyAsync(response, cancellationToken);
+        var details = _errorMessageParser(body);
+        var reason = $"{_system}: {(int)response.StatusCode} {response.ReasonPhrase}".TrimEnd();
 
         return new AtlassianApiException(
             _system,
             response.StatusCode,
-            $"{_system} request failed with status {(int)response.StatusCode} {response.ReasonPhrase}.",
-            _errorMessageParser(body));
+            string.IsNullOrWhiteSpace(details) ? reason : $"{reason} — {details}",
+            details);
     }
 
     private static async Task<string?> ReadBodyAsync(

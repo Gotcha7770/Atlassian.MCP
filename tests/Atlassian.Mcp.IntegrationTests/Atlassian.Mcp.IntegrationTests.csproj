@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Atlassian.Mcp.Infrastructure\Atlassian.Mcp.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Atlassian.MCP.Server\Atlassian.MCP.Server.csproj" />
     </ItemGroup>
 
     <ItemGroup>

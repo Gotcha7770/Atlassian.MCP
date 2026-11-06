@@ -33,7 +33,9 @@ public sealed class AuthFailureTests : IDisposable
             .ThrowAsync<AtlassianApiException>()
             .Where(error => error.System == AtlassianSystem.Jira)
             .Where(error => error.StatusCode == HttpStatusCode.Unauthorized)
-            .Where(error => error.Details == "You are not authenticated.");
+            .Where(error => error.Details == "You are not authenticated.")
+            .Where(error => error.Message.Contains("401"))
+            .Where(error => error.Message.Contains("You are not authenticated."));
     }
 
     [Fact]
