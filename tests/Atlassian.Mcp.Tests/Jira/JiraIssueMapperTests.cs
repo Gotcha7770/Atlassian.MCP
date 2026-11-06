@@ -1,6 +1,9 @@
 using System.Text.Json;
 using Atlassian.Mcp.Infrastructure.Jira;
 using Atlassian.Mcp.Infrastructure.Jira.Models;
+using JiraIssueDetails = Atlassian.Mcp.Core.Models.Jira.JiraIssueDetails;
+using JiraIssueLink = Atlassian.Mcp.Core.Models.Jira.JiraIssueLink;
+using JiraSubtask = Atlassian.Mcp.Core.Models.Jira.JiraSubtask;
 
 namespace Atlassian.Mcp.Tests.Jira;
 
@@ -32,17 +35,24 @@ public sealed class JiraIssueMapperTests
 
         var details = JiraIssueMapper.ToDetails(issue!);
 
-        details.Key.Should().Be("PROJ-123");
-        details.Id.Should().Be("10001");
-        details.Summary.Should().Be("CSV export");
-        details.Status.Should().Be("In Progress");
-        details.IssueType.Should().Be("Story");
-        details.ProjectKey.Should().Be("PROJ");
-        details.Assignee.Should().Be("Ivan Petrov");
-        details.Reporter.Should().Be("Maria Sidorova");
-        details.Priority.Should().Be("High");
-        details.Updated.Should().Be("2026-11-03T16:40:11.000+0000");
-        details.Labels.Should().ContainSingle().Which.Should().Be("reporting");
+        details
+            .Should()
+            .BeEquivalentTo(
+                new JiraIssueDetails
+                {
+                    Key = "PROJ-123",
+                    Id = "10001",
+                    Summary = "CSV export",
+                    Status = "In Progress",
+                    IssueType = "Story",
+                    ProjectKey = "PROJ",
+                    Assignee = "Ivan Petrov",
+                    Reporter = "Maria Sidorova",
+                    Priority = "High",
+                    Created = "2026-10-01T09:12:00.000+0000",
+                    Updated = "2026-11-03T16:40:11.000+0000",
+                    Labels = ["reporting"]
+                });
     }
 
     [Fact]
@@ -74,7 +84,7 @@ public sealed class JiraIssueMapperTests
         details.Subtasks.Should()
             .ContainSingle()
             .Which.Should()
-            .Satisfy<Atlassian.Mcp.Core.Models.Jira.JiraSubtask>(subtask =>
+            .Satisfy<JiraSubtask>(subtask =>
             {
                 subtask.Key.Should().Be("PROJ-94");
                 subtask.Summary.Should().Be("Create endpoint");
@@ -121,17 +131,33 @@ public sealed class JiraIssueMapperTests
 
         var details = JiraIssueMapper.ToDetails(issue!);
 
-        details.Links.Should().HaveCount(2);
-        details.Links!.Should().NotContain(link => link.Key == "PROJ-300");
-
-        var outward = details.Links.Single(link => link.Direction == "outward");
-        outward.Type.Should().Be("Blocks");
-        outward.Key.Should().Be("PROJ-200");
-        outward.Summary.Should().Be("Release");
-        outward.Status.Should().Be("To Do");
-
-        var inward = details.Links.Single(link => link.Direction == "inward");
-        inward.Key.Should().Be("PROJ-100");
+        details
+            .Should()
+            .BeEquivalentTo(
+                new JiraIssueDetails
+                {
+                    Key = "PROJ-123",
+                    Summary = "CSV export",
+                    Links =
+                    [
+                        new JiraIssueLink
+                        {
+                            Type = "Blocks",
+                            Direction = "outward",
+                            Key = "PROJ-200",
+                            Summary = "Release",
+                            Status = "To Do"
+                        },
+                        new JiraIssueLink
+                        {
+                            Type = "Blocks",
+                            Direction = "inward",
+                            Key = "PROJ-100",
+                            Summary = "Design",
+                            Status = "Done"
+                        }
+                    ]
+                });
     }
 
     [Fact]
@@ -200,9 +226,14 @@ public sealed class JiraIssueMapperTests
 
         var details = JiraIssueMapper.ToDetails(issue!);
 
-        details.Description.Should().BeNull();
-        details.Status.Should().BeNull();
-        details.Labels.Should().BeEmpty();
-        details.CustomFields.Should().BeNull();
+        details
+            .Should()
+            .BeEquivalentTo(
+                new JiraIssueDetails
+                {
+                    Key = "PROJ-123",
+                    Summary = "CSV export",
+                    Labels = []
+                });
     }
 }

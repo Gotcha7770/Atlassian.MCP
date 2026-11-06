@@ -1,19 +1,22 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text;
 using Atlassian.Mcp.Core.Contracts;
-using Atlassian.Mcp.Infrastructure;
 using Atlassian.Mcp.Core.Errors;
 using Atlassian.Mcp.Infrastructure.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using RichardSzalay.MockHttp;
 using static AwesomeAssertions.FluentActions;
 
 namespace Atlassian.Mcp.IntegrationTests.Http;
 
-public sealed class RetryOn429Tests
+public sealed class RetryOn429Tests : IClassFixture<HttpClientTestFixture>
 {
+    private readonly HttpClientTestFixture _fixture;
+
+    public RetryOn429Tests(HttpClientTestFixture fixture) => _fixture = fixture;
+
     [Fact]
     public async Task Retries_once_after_429_and_returns_success()
     {
@@ -35,11 +38,14 @@ public sealed class RetryOn429Tests
 
                 return new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent("""{"name":"tester"}""", Encoding.UTF8, "application/json")
+                    Content = new StringContent(
+                        """{"name":"tester"}""",
+                        Encoding.UTF8,
+                        MediaTypeNames.Application.Json)
                 };
             });
 
-        await using var provider = BuildProvider(jiraHandler: mock);
+        await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
         await client.CheckAvailabilityAsync(TestContext.Current.CancellationToken);
@@ -60,12 +66,12 @@ public sealed class RetryOn429Tests
                 response.Content = new StringContent(
                     """{"errorMessages":["Rate limit exceeded."]}""",
                     Encoding.UTF8,
-                    "application/json");
+                    MediaTypeNames.Application.Json);
 
                 return response;
             });
 
-        await using var provider = BuildProvider(jiraHandler: mock);
+        await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
         await Awaiting(() => client.CheckAvailabilityAsync(TestContext.Current.CancellationToken))
@@ -76,23 +82,12 @@ public sealed class RetryOn429Tests
         mock.GetMatchCount(request).Should().Be(1);
     }
 
-    private static ServiceProvider BuildProvider(HttpMessageHandler? jiraHandler = null)
-    {
-        var options = new AtlassianOptions
+    private static AtlassianOptions CreateOptions() =>
+        new()
         {
             JiraUrl = new Uri("https://jira.example.com"),
             JiraPat = "jira-token",
             ConfluenceUrl = new Uri("https://confluence.example.com"),
             ConfluencePat = "confluence-token"
         };
-
-        var services = new ServiceCollection();
-        services.AddLogging();
-        services.AddSingleton<IOptions<AtlassianOptions>>(Options.Create(options));
-        services.AddAtlassianHttpClients(jiraHandler);
-
-        return services.BuildServiceProvider();
-    }
 }
-
-

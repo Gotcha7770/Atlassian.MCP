@@ -1,17 +1,20 @@
 using System.Net;
+using System.Net.Mime;
 using Atlassian.Mcp.Core.Contracts;
-using Atlassian.Mcp.Infrastructure;
 using Atlassian.Mcp.Core.Errors;
 using Atlassian.Mcp.Infrastructure.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using RichardSzalay.MockHttp;
 using static AwesomeAssertions.FluentActions;
 
 namespace Atlassian.Mcp.IntegrationTests.Jira;
 
-public sealed class GetIssueTests
+public sealed class GetIssueTests : IClassFixture<HttpClientTestFixture>
 {
+    private readonly HttpClientTestFixture _fixture;
+
+    public GetIssueTests(HttpClientTestFixture fixture) => _fixture = fixture;
+
     [Fact]
     public async Task Requests_all_fields_when_list_is_not_specified()
     {
@@ -19,9 +22,9 @@ public sealed class GetIssueTests
         var request = mock
             .When("https://jira.example.com/rest/api/2/issue/PROJ-123")
             .WithQueryString("fields", "*all")
-            .Respond("application/json", IssueBody);
+            .Respond(MediaTypeNames.Application.Json, IssueBody);
 
-        await using var provider = BuildProvider("https://jira.example.com", mock);
+        await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
         var issue = await client.GetIssueAsync("PROJ-123", null, TestContext.Current.CancellationToken);
@@ -38,9 +41,9 @@ public sealed class GetIssueTests
         var request = mock
             .When("https://jira.example.com/rest/api/2/issue/PROJ-123")
             .WithQueryString("fields", "summary,status")
-            .Respond("application/json", IssueBody);
+            .Respond(MediaTypeNames.Application.Json, IssueBody);
 
-        await using var provider = BuildProvider("https://jira.example.com", mock);
+        await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
         await client.GetIssueAsync(
@@ -57,9 +60,11 @@ public sealed class GetIssueTests
         var mock = new MockHttpMessageHandler();
         var request = mock
             .When("https://jira.example.com/jira/rest/api/2/issue/PROJ-123")
-            .Respond("application/json", IssueBody);
+            .Respond(MediaTypeNames.Application.Json, IssueBody);
 
-        await using var provider = BuildProvider("https://jira.example.com/jira", mock);
+        await using var provider = _fixture.CreateProvider(
+            CreateOptions("https://jira.example.com/jira"),
+            jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
         var issue = await client.GetIssueAsync("PROJ-123", null, TestContext.Current.CancellationToken);
@@ -76,9 +81,9 @@ public sealed class GetIssueTests
         var mock = new MockHttpMessageHandler();
         mock
             .When("https://jira.example.com/rest/api/2/issue/PROJ-123")
-            .Respond(status, "application/json", """{"errorMessages":["Issue does not exist."]}""");
+            .Respond(status, MediaTypeNames.Application.Json, """{"errorMessages":["Issue does not exist."]}""");
 
-        await using var provider = BuildProvider("https://jira.example.com", mock);
+        await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
         await Awaiting(() => client.GetIssueAsync("PROJ-123", null, TestContext.Current.CancellationToken))
@@ -96,7 +101,7 @@ public sealed class GetIssueTests
             .When("https://jira.example.com/rest/api/2/issue/PROJ-123")
             .Respond(HttpStatusCode.NoContent);
 
-        await using var provider = BuildProvider("https://jira.example.com", mock);
+        await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
         await Awaiting(() => client.GetIssueAsync("PROJ-123", null, TestContext.Current.CancellationToken))
@@ -104,7 +109,8 @@ public sealed class GetIssueTests
             .ThrowAsync<AtlassianApiException>();
     }
 
-    private const string IssueBody = """
+    private const string IssueBody =
+        """
         {
           "key": "PROJ-123",
           "fields": {
@@ -114,23 +120,12 @@ public sealed class GetIssueTests
         }
         """;
 
-    private static ServiceProvider BuildProvider(string jiraUrl, HttpMessageHandler? jiraHandler = null)
-    {
-        var options = new AtlassianOptions
+    private static AtlassianOptions CreateOptions(string jiraUrl = "https://jira.example.com") =>
+        new()
         {
             JiraUrl = new Uri(jiraUrl),
             JiraPat = "jira-token",
             ConfluenceUrl = new Uri("https://confluence.example.com"),
             ConfluencePat = "confluence-token"
         };
-
-        var services = new ServiceCollection();
-        services.AddLogging();
-        services.AddSingleton<IOptions<AtlassianOptions>>(Options.Create(options));
-        services.AddAtlassianHttpClients(jiraHandler);
-
-        return services.BuildServiceProvider();
-    }
 }
-
-
