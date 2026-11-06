@@ -129,7 +129,7 @@ MCP client configuration then runs the installed command instead of the project:
 
 All tools are read-only. The response is bounded by per-part budgets: text fields to 16 KB of
 UTF-8, Jira custom fields to 32 KB in total and 100 fields; when a value is truncated or a
-field is dropped, `truncated` is set and `truncation` is filled. Error messages contain the
+field is dropped, `truncated` is set and `truncations` is filled. Error messages contain the
 system, the HTTP status code and a short reason; tokens and the `Authorization` header never
 appear in responses or diagnostics.
 
