@@ -6,8 +6,6 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 public sealed record ProjectRef
 {
     public string? Id { get; init; }
-
     public string? Key { get; init; }
-
     public string? Name { get; init; }
 }

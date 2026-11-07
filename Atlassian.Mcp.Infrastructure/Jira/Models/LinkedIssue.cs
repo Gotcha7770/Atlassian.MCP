@@ -6,6 +6,5 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 public sealed record LinkedIssue
 {
     public string? Key { get; init; }
-
     public LinkedIssueFields? Fields { get; init; }
 }

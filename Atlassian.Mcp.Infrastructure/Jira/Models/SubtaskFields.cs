@@ -6,6 +6,5 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 public sealed record SubtaskFields
 {
     public string? Summary { get; init; }
-
     public NamedValue? Status { get; init; }
 }

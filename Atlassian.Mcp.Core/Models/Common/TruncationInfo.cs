@@ -6,8 +6,6 @@ namespace Atlassian.Mcp.Core.Models.Common;
 public sealed record TruncationInfo
 {
     public required string Field { get; init; }
-
     public int OriginalLength { get; init; }
-
     public int AppliedLength { get; init; }
 }

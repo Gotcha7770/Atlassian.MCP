@@ -6,6 +6,5 @@ namespace Atlassian.Mcp.Infrastructure.Confluence.Models;
 public sealed record CurrentUser
 {
     public string? Username { get; init; }
-
     public string? DisplayName { get; init; }
 }

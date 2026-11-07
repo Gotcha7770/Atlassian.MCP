@@ -6,6 +6,5 @@ namespace Atlassian.Mcp.Infrastructure.Confluence.Models;
 public sealed record ErrorResponse
 {
     public int? StatusCode { get; init; }
-
     public string? Message { get; init; }
 }

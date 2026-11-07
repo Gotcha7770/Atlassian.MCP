@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Atlassian.Mcp.Core.Common;
 using Atlassian.Mcp.Core.Contracts;
+using Atlassian.Mcp.Core.Models.Common;
 using Atlassian.Mcp.Core.Models.Jira;
 using Atlassian.MCP.Server.Tools;
 using ModelContextProtocol;
@@ -45,9 +46,14 @@ public sealed class JiraGetIssueContractTests
 
         issue.Description.Should().HaveLength(ResponseLimiter.MaxTextBytes);
         issue.Truncated.Should().BeTrue();
-        issue.Truncation.Should().NotBeNull();
-        issue.Truncation!.Field.Should().Be("description");
-        issue.Truncation.OriginalLength.Should().Be(description.Length);
+        issue.Truncations.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Satisfy<TruncationInfo>(truncation =>
+            {
+                truncation.Field.Should().Be("description");
+                truncation.OriginalLength.Should().Be(description.Length);
+            });
     }
 
     [Fact]
@@ -66,7 +72,7 @@ public sealed class JiraGetIssueContractTests
     [Fact]
     public void Response_uses_contract_property_names()
     {
-        var details = new JiraIssueDetails
+        var details = new IssueDetails
         {
             Key = "PROJ-123",
             ProjectKey = "PROJ",
@@ -81,6 +87,17 @@ public sealed class JiraGetIssueContractTests
         json.Should().Contain("\"key\"");
         json.Should().Contain("\"projectKey\"");
         json.Should().Contain("\"customFields\"");
+    }
+
+    [Fact]
+    public void Response_omits_properties_without_value()
+    {
+        var details = new IssueDetails { Key = "PROJ-123" };
+
+        var json = JsonSerializer.Serialize(details, McpJsonUtilities.DefaultOptions);
+
+        json.Should().Contain("\"key\"");
+        json.Should().NotContain("null");
     }
 
     private static McpServerTool CreateTool(IJiraClient client)
@@ -99,14 +116,14 @@ public sealed class JiraGetIssueContractTests
 
         public Task CheckAvailabilityAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public Task<JiraIssueDetails> GetIssueAsync(
+        public Task<IssueDetails> GetIssueAsync(
             string issueKey,
             IReadOnlyList<string>? fields,
             CancellationToken cancellationToken)
         {
             Calls++;
 
-            return Task.FromResult(new JiraIssueDetails
+            return Task.FromResult(new IssueDetails
             {
                 Key = issueKey,
                 Description = Description

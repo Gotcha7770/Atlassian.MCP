@@ -6,6 +6,5 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 public sealed record CurrentUser
 {
     public string? Name { get; init; }
-
     public string? Key { get; init; }
 }

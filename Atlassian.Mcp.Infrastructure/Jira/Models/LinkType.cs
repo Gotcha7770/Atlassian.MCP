@@ -6,8 +6,6 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 public sealed record LinkType
 {
     public string? Name { get; init; }
-
     public string? Inward { get; init; }
-
     public string? Outward { get; init; }
 }

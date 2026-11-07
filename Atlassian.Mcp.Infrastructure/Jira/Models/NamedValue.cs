@@ -6,6 +6,5 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 public sealed record NamedValue
 {
     public string? Id { get; init; }
-
     public string? Name { get; init; }
 }
