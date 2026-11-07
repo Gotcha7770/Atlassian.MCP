@@ -11,17 +11,17 @@ public sealed class ResponseSizeTests
     {
         var description = new string('x', ResponseLimiter.MaxTextBytes * 2);
 
-        var details = JiraIssueDetailsLimiter.Limit(new JiraIssueDetails
+        var details = IssueResponseLimiter.Limit(new IssueResponse
         {
             Key = "PROJ-123",
             Description = description
         });
 
         details.Description.Should().HaveLength(ResponseLimiter.MaxTextBytes);
-        details.Truncated.Should().BeTrue();
-        details.Truncation.Should().NotBeNull();
-        details.Truncation!.Field.Should().Be("description");
-        details.Truncation.OriginalLength.Should().Be(description.Length);
+        details.TruncatedProperties.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Be("description");
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public sealed class ResponseSizeTests
     {
         var description = new string('ж', ResponseLimiter.MaxTextBytes);
 
-        var details = JiraIssueDetailsLimiter.Limit(new JiraIssueDetails
+        var details = IssueResponseLimiter.Limit(new IssueResponse
         {
             Key = "PROJ-123",
             Description = description
@@ -38,16 +38,18 @@ public sealed class ResponseSizeTests
         details.Description.Should().NotBeNull();
         details.Description!.Length.Should().BeLessThan(description.Length);
         ResponseLimiter.GetUtf8Length(details.Description).Should().BeLessThanOrEqualTo(ResponseLimiter.MaxTextBytes);
-        details.Truncation.Should().NotBeNull();
-        details.Truncation!.Field.Should().Be("description");
+        details.TruncatedProperties.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Be("description");
     }
 
     [Fact]
-    public void Drops_custom_field_that_exceeds_budget_and_keeps_the_rest()
+    public void Drops_custom_field_that_exceeds_limit_and_keeps_the_rest()
     {
-        var huge = new string('x', ResponseLimiter.MaxCustomFieldsBytes + 1);
+        var huge = new string('x', ResponseLimiter.MaxCustomFieldBytes + 1);
 
-        var details = JiraIssueDetailsLimiter.Limit(new JiraIssueDetails
+        var details = IssueResponseLimiter.Limit(new IssueResponse
         {
             Key = "PROJ-123",
             CustomFields = new Dictionary<string, JsonElement>
@@ -60,11 +62,10 @@ public sealed class ResponseSizeTests
         details.CustomFields.Should().NotBeNull();
         details.CustomFields!.Should().ContainKey("customfield_10202");
         details.CustomFields.Should().NotContainKey("customfield_10101");
-        details.Truncated.Should().BeTrue();
-        details.Truncation.Should().NotBeNull();
-        details.Truncation!.Field.Should().Be("customFields");
-        details.Truncation.OriginalLength.Should().Be(2);
-        details.Truncation.AppliedLength.Should().Be(1);
+        details.TruncatedProperties.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Be("customFields");
     }
 
     [Fact]
@@ -77,15 +78,17 @@ public sealed class ResponseSizeTests
             customFields[$"customfield_{index}"] = JsonDocument.Parse("1").RootElement;
         }
 
-        var details = JiraIssueDetailsLimiter.Limit(new JiraIssueDetails
+        var details = IssueResponseLimiter.Limit(new IssueResponse
         {
             Key = "PROJ-123",
             CustomFields = customFields
         });
 
         details.CustomFields.Should().HaveCount(ResponseLimiter.MaxItems);
-        details.Truncation.Should().NotBeNull();
-        details.Truncation!.Field.Should().Be("customFields");
+        details.TruncatedProperties.Should()
+            .ContainSingle()
+            .Which.Should()
+            .Be("customFields");
     }
 
     [Fact]
@@ -100,7 +103,7 @@ public sealed class ResponseSizeTests
 
         var links = Enumerable
             .Range(0, 60)
-            .Select(index => new JiraIssueLink
+            .Select(index => new IssueLink
             {
                 Type = "Blocks",
                 Direction = "outward",
@@ -110,13 +113,13 @@ public sealed class ResponseSizeTests
 
         var subtasks = Enumerable
             .Range(0, 60)
-            .Select(index => new JiraSubtask
+            .Select(index => new Subtask
             {
                 Key = $"PROJ-{index}"
             })
             .ToList();
 
-        var details = JiraIssueDetailsLimiter.Limit(new JiraIssueDetails
+        var details = IssueResponseLimiter.Limit(new IssueResponse
         {
             Key = "PROJ-123",
             CustomFields = customFields,
@@ -127,17 +130,16 @@ public sealed class ResponseSizeTests
         details.CustomFields.Should().BeNull();
         details.Links.Should().HaveCount(60);
         details.Subtasks.Should().HaveCount(40);
-        details.Truncated.Should().BeTrue();
-        details.Truncation.Should().NotBeNull();
-        details.Truncation!.Field.Should().Be("subtasks");
-        details.Truncation.OriginalLength.Should().Be(subtasks.Count);
-        details.Truncation.AppliedLength.Should().Be(40);
+        details.TruncatedProperties.Should()
+            .SatisfyRespectively(
+                first => first.Should().Be("subtasks"),
+                second => second.Should().Be("customFields"));
     }
 
     [Fact]
     public void Keeps_small_response_unchanged()
     {
-        var details = JiraIssueDetailsLimiter.Limit(new JiraIssueDetails
+        var details = IssueResponseLimiter.Limit(new IssueResponse
         {
             Key = "PROJ-123",
             Summary = "CSV export",
@@ -148,7 +150,6 @@ public sealed class ResponseSizeTests
         });
 
         details.CustomFields.Should().ContainKey("customfield_10101");
-        details.Truncated.Should().BeFalse();
-        details.Truncation.Should().BeNull();
+        details.TruncatedProperties.Should().BeEmpty();
     }
 }

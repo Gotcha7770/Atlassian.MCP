@@ -50,7 +50,7 @@ public sealed class JiraClient : IJiraClient
             nameof(CheckAvailabilityAsync));
     }
 
-    public async Task<IssueDetails> GetIssueAsync(
+    public async Task<IssueResponse> GetIssueAsync(
         string issueKey,
         IReadOnlyList<string>? fields,
         CancellationToken cancellationToken)

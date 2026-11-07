@@ -1,7 +1,7 @@
 using System.Text.Json;
+using Atlassian.Mcp.Core.Models.Jira;
 using Atlassian.Mcp.Infrastructure.Jira;
 using Atlassian.Mcp.Infrastructure.Jira.Models;
-using CoreIssueDetails = Atlassian.Mcp.Core.Models.Jira.IssueDetails;
 using CoreIssueLink = Atlassian.Mcp.Core.Models.Jira.IssueLink;
 using CoreSubtask = Atlassian.Mcp.Core.Models.Jira.Subtask;
 
@@ -38,7 +38,7 @@ public sealed class IssueMapperTests
         details
             .Should()
             .BeEquivalentTo(
-                new CoreIssueDetails
+                new IssueResponse
                 {
                     Key = "PROJ-123",
                     Id = "10001",
@@ -134,7 +134,7 @@ public sealed class IssueMapperTests
         details
             .Should()
             .BeEquivalentTo(
-                new CoreIssueDetails
+                new IssueResponse
                 {
                     Key = "PROJ-123",
                     Summary = "CSV export",
@@ -233,7 +233,7 @@ public sealed class IssueMapperTests
         details
             .Should()
             .BeEquivalentTo(
-                new CoreIssueDetails
+                new IssueResponse
                 {
                     Key = "PROJ-123",
                     Summary = "CSV export",

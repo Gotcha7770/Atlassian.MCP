@@ -14,9 +14,9 @@ public static class ResponseLimiter
     public const int MaxTextBytes = 16 * 1024;
 
     /// <summary>
-    /// Суммарный бюджет пользовательских полей Jira в байтах UTF-8.
+    /// Максимальный размер значения одного пользовательского поля Jira в байтах UTF-8.
     /// </summary>
-    public const int MaxCustomFieldsBytes = 32 * 1024;
+    public const int MaxCustomFieldBytes = 512;
 
     /// <summary>
     /// Общий предел элементов для связей, подзадач и пользовательских полей в ответе.

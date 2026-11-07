@@ -15,11 +15,11 @@ public static class IssueMapper
 {
     private const string CustomFieldPrefix = "customfield_";
 
-    public static IssueDetails ToDetails(Issue issue)
+    public static IssueResponse ToDetails(Issue issue)
     {
         var fields = issue.Fields;
 
-        return new IssueDetails
+        return new IssueResponse
         {
             Key = issue.Key ?? string.Empty,
             Id = issue.Id,

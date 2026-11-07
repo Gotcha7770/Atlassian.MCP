@@ -1,12 +1,11 @@
 using System.Text.Json;
-using Atlassian.Mcp.Core.Models.Common;
 
 namespace Atlassian.Mcp.Core.Models.Jira;
 
 /// <summary>
 /// Задача Jira в виде, пригодном для MCP-инструмента.
 /// </summary>
-public sealed record IssueDetails
+public sealed record IssueResponse
 {
     public required string Key { get; init; }
     public string? Id { get; init; }
@@ -24,6 +23,5 @@ public sealed record IssueDetails
     public IReadOnlyList<Subtask>? Subtasks { get; init; }
     public IReadOnlyList<IssueLink>? Links { get; init; }
     public Dictionary<string, JsonElement>? CustomFields { get; init; }
-    public bool Truncated { get; init; }
-    public IReadOnlyList<TruncationInfo> Truncations { get; init; } = [];
+    public IReadOnlyList<string> TruncatedProperties { get; init; } = [];
 }
