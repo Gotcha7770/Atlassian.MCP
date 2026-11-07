@@ -50,7 +50,7 @@ public sealed class JiraClient : IJiraClient
             nameof(CheckAvailabilityAsync));
     }
 
-    public async Task<JiraIssueDetails> GetIssueAsync(
+    public async Task<IssueDetails> GetIssueAsync(
         string issueKey,
         IReadOnlyList<string>? fields,
         CancellationToken cancellationToken)
@@ -62,7 +62,7 @@ public sealed class JiraClient : IJiraClient
             AtlassianSystem.Jira,
             nameof(GetIssueAsync));
 
-        JiraIssue? issue;
+        Issue? issue;
 
         try
         {
@@ -93,6 +93,6 @@ public sealed class JiraClient : IJiraClient
                 $"{AtlassianSystem.Jira}: {ErrorMessages.EmptyResponse}");
         }
 
-        return JiraIssueMapper.ToDetails(issue);
+        return IssueMapper.ToDetails(issue);
     }
 }

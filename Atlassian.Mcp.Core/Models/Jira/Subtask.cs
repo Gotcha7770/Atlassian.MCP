@@ -3,7 +3,7 @@ namespace Atlassian.Mcp.Core.Models.Jira;
 /// <summary>
 /// Подзадача Jira в ответе инструмента.
 /// </summary>
-public sealed record JiraSubtask
+public sealed record Subtask
 {
     public required string Key { get; init; }
 

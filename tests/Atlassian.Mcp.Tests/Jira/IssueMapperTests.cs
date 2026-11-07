@@ -1,13 +1,13 @@
 using System.Text.Json;
 using Atlassian.Mcp.Infrastructure.Jira;
 using Atlassian.Mcp.Infrastructure.Jira.Models;
-using JiraIssueDetails = Atlassian.Mcp.Core.Models.Jira.JiraIssueDetails;
-using JiraIssueLink = Atlassian.Mcp.Core.Models.Jira.JiraIssueLink;
-using JiraSubtask = Atlassian.Mcp.Core.Models.Jira.JiraSubtask;
+using CoreIssueDetails = Atlassian.Mcp.Core.Models.Jira.IssueDetails;
+using CoreIssueLink = Atlassian.Mcp.Core.Models.Jira.IssueLink;
+using CoreSubtask = Atlassian.Mcp.Core.Models.Jira.Subtask;
 
 namespace Atlassian.Mcp.Tests.Jira;
 
-public sealed class JiraIssueMapperTests
+public sealed class IssueMapperTests
 {
     [Fact]
     public void Maps_typed_fields()
@@ -31,14 +31,14 @@ public sealed class JiraIssueMapperTests
         }
         """;
 
-        var issue = JsonSerializer.Deserialize<JiraIssue>(body, JsonSerializerOptions.Web);
+        var issue = JsonSerializer.Deserialize<Issue>(body, JsonSerializerOptions.Web);
 
-        var details = JiraIssueMapper.ToDetails(issue!);
+        var details = IssueMapper.ToDetails(issue!);
 
         details
             .Should()
             .BeEquivalentTo(
-                new JiraIssueDetails
+                new CoreIssueDetails
                 {
                     Key = "PROJ-123",
                     Id = "10001",
@@ -77,14 +77,14 @@ public sealed class JiraIssueMapperTests
         }
         """;
 
-        var issue = JsonSerializer.Deserialize<JiraIssue>(body, JsonSerializerOptions.Web);
+        var issue = JsonSerializer.Deserialize<Issue>(body, JsonSerializerOptions.Web);
 
-        var details = JiraIssueMapper.ToDetails(issue!);
+        var details = IssueMapper.ToDetails(issue!);
 
         details.Subtasks.Should()
             .ContainSingle()
             .Which.Should()
-            .Satisfy<JiraSubtask>(subtask =>
+            .Satisfy<CoreSubtask>(subtask =>
             {
                 subtask.Key.Should().Be("PROJ-94");
                 subtask.Summary.Should().Be("Create endpoint");
@@ -127,20 +127,20 @@ public sealed class JiraIssueMapperTests
         }
         """;
 
-        var issue = JsonSerializer.Deserialize<JiraIssue>(body, JsonSerializerOptions.Web);
+        var issue = JsonSerializer.Deserialize<Issue>(body, JsonSerializerOptions.Web);
 
-        var details = JiraIssueMapper.ToDetails(issue!);
+        var details = IssueMapper.ToDetails(issue!);
 
         details
             .Should()
             .BeEquivalentTo(
-                new JiraIssueDetails
+                new CoreIssueDetails
                 {
                     Key = "PROJ-123",
                     Summary = "CSV export",
                     Links =
                     [
-                        new JiraIssueLink
+                        new CoreIssueLink
                         {
                             Type = "Blocks",
                             Direction = "outward",
@@ -148,7 +148,7 @@ public sealed class JiraIssueMapperTests
                             Summary = "Release",
                             Status = "To Do"
                         },
-                        new JiraIssueLink
+                        new CoreIssueLink
                         {
                             Type = "Blocks",
                             Direction = "inward",
@@ -178,9 +178,9 @@ public sealed class JiraIssueMapperTests
         }
         """;
 
-        var issue = JsonSerializer.Deserialize<JiraIssue>(body, JsonSerializerOptions.Web);
+        var issue = JsonSerializer.Deserialize<Issue>(body, JsonSerializerOptions.Web);
 
-        var details = JiraIssueMapper.ToDetails(issue!);
+        var details = IssueMapper.ToDetails(issue!);
 
         details.CustomFields.Should().NotBeNull();
         details.CustomFields!.Should().ContainKeys("customfield_10101", "customfield_10202");
@@ -204,9 +204,9 @@ public sealed class JiraIssueMapperTests
         }
         """;
 
-        var issue = JsonSerializer.Deserialize<JiraIssue>(body, JsonSerializerOptions.Web);
+        var issue = JsonSerializer.Deserialize<Issue>(body, JsonSerializerOptions.Web);
 
-        var details = JiraIssueMapper.ToDetails(issue!);
+        var details = IssueMapper.ToDetails(issue!);
 
         details.CustomFields.Should().ContainKey("customfield_10101");
         details.CustomFields!["customfield_10101"].ValueKind.Should().Be(JsonValueKind.String);
@@ -226,14 +226,14 @@ public sealed class JiraIssueMapperTests
         }
         """;
 
-        var issue = JsonSerializer.Deserialize<JiraIssue>(body, JsonSerializerOptions.Web);
+        var issue = JsonSerializer.Deserialize<Issue>(body, JsonSerializerOptions.Web);
 
-        var details = JiraIssueMapper.ToDetails(issue!);
+        var details = IssueMapper.ToDetails(issue!);
 
         details
             .Should()
             .BeEquivalentTo(
-                new JiraIssueDetails
+                new CoreIssueDetails
                 {
                     Key = "PROJ-123",
                     Summary = "CSV export",

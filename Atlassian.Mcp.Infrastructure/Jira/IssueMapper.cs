@@ -1,25 +1,25 @@
 using System.Text.Json;
 using Atlassian.Mcp.Core.Models.Jira;
 using Atlassian.Mcp.Infrastructure.Jira.Models;
-using CoreIssueLink = Atlassian.Mcp.Core.Models.Jira.JiraIssueLink;
-using CoreSubtask = Atlassian.Mcp.Core.Models.Jira.JiraSubtask;
-using InfraIssueLink = Atlassian.Mcp.Infrastructure.Jira.Models.JiraIssueLink;
-using InfraSubtask = Atlassian.Mcp.Infrastructure.Jira.Models.JiraSubtask;
+using CoreIssueLink = Atlassian.Mcp.Core.Models.Jira.IssueLink;
+using CoreSubtask = Atlassian.Mcp.Core.Models.Jira.Subtask;
+using InfraIssueLink = Atlassian.Mcp.Infrastructure.Jira.Models.IssueLink;
+using InfraSubtask = Atlassian.Mcp.Infrastructure.Jira.Models.Subtask;
 
 namespace Atlassian.Mcp.Infrastructure.Jira;
 
 /// <summary>
 /// Преобразует задачу REST API Jira в модель MCP-инструмента.
 /// </summary>
-public static class JiraIssueMapper
+public static class IssueMapper
 {
     private const string CustomFieldPrefix = "customfield_";
 
-    public static JiraIssueDetails ToDetails(JiraIssue issue)
+    public static IssueDetails ToDetails(Issue issue)
     {
         var fields = issue.Fields;
 
-        return new JiraIssueDetails
+        return new IssueDetails
         {
             Key = issue.Key ?? string.Empty,
             Id = issue.Id,
@@ -98,7 +98,7 @@ public static class JiraIssueMapper
         return mapped.Count == 0 ? null : mapped.ToArray();
     }
 
-    private static bool IsBlocking(JiraLinkType? type) =>
+    private static bool IsBlocking(LinkType? type) =>
         type?.Name is { } name
         && (name.Contains("block", StringComparison.OrdinalIgnoreCase)
             || name.Contains("блок", StringComparison.OrdinalIgnoreCase));

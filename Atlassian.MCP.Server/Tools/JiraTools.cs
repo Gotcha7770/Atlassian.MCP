@@ -19,7 +19,7 @@ public sealed class JiraTools
 
     [McpServerTool(Name = "jiraGetIssue", ReadOnly = true)]
     [Description("Get a Jira issue by key: summary, description, status, type, project, people, dates and custom fields.")]
-    public async Task<JiraIssueDetails> GetIssue(
+    public async Task<IssueDetails> GetIssue(
         [Description("Issue key, for example PROJ-123.")] string issueKey,
         [Description("Fields to return; omit to get all fields including custom fields.")] string[]? fields = null,
         CancellationToken cancellationToken = default)
@@ -31,7 +31,7 @@ public sealed class JiraTools
 
         var issue = await _client.GetIssueAsync(issueKey, fields, cancellationToken);
 
-        return JiraIssueDetailsLimiter.Limit(issue);
+        return IssueDetailsLimiter.Limit(issue);
     }
 }
 

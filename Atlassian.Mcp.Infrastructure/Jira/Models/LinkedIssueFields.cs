@@ -3,9 +3,9 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 /// <summary>
 /// Поля связанной задачи Jira, нужные агенту.
 /// </summary>
-public sealed record JiraLinkedIssueFields
+public sealed record LinkedIssueFields
 {
     public string? Summary { get; init; }
 
-    public JiraNamedValue? Status { get; init; }
+    public NamedValue? Status { get; init; }
 }

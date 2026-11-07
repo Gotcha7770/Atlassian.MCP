@@ -3,7 +3,7 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 /// <summary>
 /// Тип связи Jira: например, <c>Blocks</c>.
 /// </summary>
-public sealed record JiraLinkType
+public sealed record LinkType
 {
     public string? Name { get; init; }
 

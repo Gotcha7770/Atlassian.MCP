@@ -1,13 +1,11 @@
 namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 
 /// <summary>
-/// Ссылка на проект Jira внутри задачи.
+/// Задача Jira в формате REST API 2.
 /// </summary>
-public sealed record JiraProjectRef
+public sealed record Issue
 {
     public string? Id { get; init; }
-
     public string? Key { get; init; }
-
-    public string? Name { get; init; }
+    public IssueFields? Fields { get; init; }
 }

@@ -16,11 +16,11 @@ public static class JiraErrorParser
             return null;
         }
 
-        JiraErrorResponse? response;
+        ErrorResponse? response;
 
         try
         {
-            response = JsonSerializer.Deserialize<JiraErrorResponse>(body, JsonSerializerOptions.Web);
+            response = JsonSerializer.Deserialize<ErrorResponse>(body, JsonSerializerOptions.Web);
         }
         catch (JsonException)
         {

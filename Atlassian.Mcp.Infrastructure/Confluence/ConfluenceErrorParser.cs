@@ -17,7 +17,7 @@ public static class ConfluenceErrorParser
 
         try
         {
-            var response = JsonSerializer.Deserialize<ConfluenceErrorResponse>(body, JsonSerializerOptions.Web);
+            var response = JsonSerializer.Deserialize<ErrorResponse>(body, JsonSerializerOptions.Web);
 
             return response?.Message;
         }

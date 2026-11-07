@@ -6,7 +6,7 @@ namespace Atlassian.Mcp.Core.Models.Jira;
 /// <summary>
 /// Задача Jira в виде, пригодном для MCP-инструмента.
 /// </summary>
-public sealed record JiraIssueDetails
+public sealed record IssueDetails
 {
     public required string Key { get; init; }
 
@@ -34,13 +34,13 @@ public sealed record JiraIssueDetails
 
     public string[]? Labels { get; init; }
 
-    public IReadOnlyList<JiraSubtask>? Subtasks { get; init; }
+    public IReadOnlyList<Subtask>? Subtasks { get; init; }
 
-    public IReadOnlyList<JiraIssueLink>? Links { get; init; }
+    public IReadOnlyList<IssueLink>? Links { get; init; }
 
     public Dictionary<string, JsonElement>? CustomFields { get; init; }
 
     public bool Truncated { get; init; }
 
-    public TruncationInfo? Truncation { get; init; }
+    public IReadOnlyList<TruncationInfo> Truncations { get; init; } = [];
 }

@@ -10,6 +10,6 @@ namespace Atlassian.Mcp.Infrastructure.Confluence;
 public interface IConfluenceApi
 {
     [Get("/rest/api/user/current")]
-    Task<ConfluenceCurrentUser> GetCurrentUser(CancellationToken cancellationToken);
+    Task<CurrentUser> GetCurrentUser(CancellationToken cancellationToken);
 }
 

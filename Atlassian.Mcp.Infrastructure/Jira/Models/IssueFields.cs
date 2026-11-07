@@ -6,23 +6,23 @@ namespace Atlassian.Mcp.Infrastructure.Jira.Models;
 /// <summary>
 /// Поля задачи Jira: типизированные стандартные и произвольные неизвестные.
 /// </summary>
-public sealed record JiraIssueFields
+public sealed record IssueFields
 {
     public string? Summary { get; init; }
 
     public string? Description { get; init; }
 
-    public JiraNamedValue? Status { get; init; }
+    public NamedValue? Status { get; init; }
 
-    public JiraNamedValue? IssueType { get; init; }
+    public NamedValue? IssueType { get; init; }
 
-    public JiraProjectRef? Project { get; init; }
+    public ProjectRef? Project { get; init; }
 
     public JiraUser? Assignee { get; init; }
 
     public JiraUser? Reporter { get; init; }
 
-    public JiraNamedValue? Priority { get; init; }
+    public NamedValue? Priority { get; init; }
 
     public string? Created { get; init; }
 
@@ -30,9 +30,9 @@ public sealed record JiraIssueFields
 
     public string[]? Labels { get; init; }
 
-    public JiraSubtask[]? Subtasks { get; init; }
+    public Subtask[]? Subtasks { get; init; }
 
-    public JiraIssueLink[]? IssueLinks { get; init; }
+    public IssueLink[]? IssueLinks { get; init; }
 
     /// <summary>
     /// Все поля, не описанные типизированными свойствами: пользовательские

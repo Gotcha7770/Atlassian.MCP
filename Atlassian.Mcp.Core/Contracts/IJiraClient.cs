@@ -16,7 +16,7 @@ public interface IJiraClient
     /// Возвращает задачу по ключу. Без списка полей запрашиваются все поля,
     /// включая пользовательские.
     /// </summary>
-    Task<JiraIssueDetails> GetIssueAsync(
+    Task<IssueDetails> GetIssueAsync(
         string issueKey,
         IReadOnlyList<string>? fields,
         CancellationToken cancellationToken);

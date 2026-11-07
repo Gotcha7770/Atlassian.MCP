@@ -3,7 +3,7 @@ namespace Atlassian.Mcp.Core.Models.Jira;
 /// <summary>
 /// Блокирующая связь задачи Jira в ответе инструмента.
 /// </summary>
-public sealed record JiraIssueLink
+public sealed record IssueLink
 {
     public required string Type { get; init; }
 
