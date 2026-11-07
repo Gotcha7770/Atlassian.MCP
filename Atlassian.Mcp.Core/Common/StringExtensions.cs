@@ -6,6 +6,8 @@ public static class StringExtensions
 {
     extension(string value)
     {
+        public int Utf8Length => Encoding.UTF8.GetByteCount(value);
+
         /// <summary>
         /// Усекает строку так, чтобы её UTF-8 представление не превышало
         /// <paramref name="maxBytes"/>, не разрывая символ.

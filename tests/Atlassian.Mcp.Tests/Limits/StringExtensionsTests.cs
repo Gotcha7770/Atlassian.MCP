@@ -18,7 +18,7 @@ public sealed class StringExtensionsTests
         var result = value.TruncateToBytes(maxBytes);
 
         result.Should().Be(expected);
-        ResponseLimiter.GetUtf8Length(result).Should().BeLessThanOrEqualTo(Math.Max(maxBytes, 0));
+        result.Utf8Length.Should().BeLessThanOrEqualTo(Math.Max(maxBytes, 0));
     }
 
     [Fact]

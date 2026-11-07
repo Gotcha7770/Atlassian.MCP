@@ -36,8 +36,8 @@ public sealed class ResponseSizeTests
         });
 
         details.Description.Should().NotBeNull();
-        details.Description!.Length.Should().BeLessThan(description.Length);
-        ResponseLimiter.GetUtf8Length(details.Description).Should().BeLessThanOrEqualTo(ResponseLimiter.MaxTextBytes);
+        details.Description.Length.Should().BeLessThan(description.Length);
+        details.Description.Utf8Length.Should().BeLessThanOrEqualTo(ResponseLimiter.MaxTextBytes);
         details.TruncatedProperties.Should()
             .ContainSingle()
             .Which.Should()
@@ -60,7 +60,7 @@ public sealed class ResponseSizeTests
         });
 
         details.CustomFields.Should().NotBeNull();
-        details.CustomFields!.Should().ContainKey("customfield_10202");
+        details.CustomFields.Should().ContainKey("customfield_10202");
         details.CustomFields.Should().NotContainKey("customfield_10101");
         details.TruncatedProperties.Should()
             .ContainSingle()

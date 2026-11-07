@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Atlassian.Mcp.Core.Common;
 
 /// <summary>
@@ -23,6 +21,4 @@ public static class ResponseLimiter
     /// Элементы распределяются по приоритету: `links` → `subtasks` → `customFields`.
     /// </summary>
     public const int MaxItems = 100;
-
-    public static int GetUtf8Length(string value) => Encoding.UTF8.GetByteCount(value);
 }
