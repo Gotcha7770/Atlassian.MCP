@@ -1,0 +1,11 @@
+@apiToken = {{$env.JIRA_API_TOKEN}}
+
+### Get Status Category Values
+GET {{jira-url}}/rest/api/2/statuscategory
+Authorization: Bearer {{apiToken}}
+Accept: application/json
+
+### GET Issue
+GET {{jira-url}}/rest/api/2/issue/MEN-72
+Authorization: Bearer {{apiToken}}
+Accept: application/json

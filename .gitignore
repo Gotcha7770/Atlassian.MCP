@@ -351,3 +351,6 @@ opencode.json
 # Spec Kit
 .specify/
 /specs
+
+# Private .env files
+*.private.env.json
