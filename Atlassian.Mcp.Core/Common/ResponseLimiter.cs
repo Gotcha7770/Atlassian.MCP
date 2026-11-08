@@ -18,7 +18,6 @@ public static class ResponseLimiter
 
     /// <summary>
     /// Общий предел элементов для связей, подзадач и пользовательских полей в ответе.
-    /// Элементы распределяются по приоритету: `links` → `subtasks` → `customFields`.
     /// </summary>
     public const int MaxItems = 100;
 }
