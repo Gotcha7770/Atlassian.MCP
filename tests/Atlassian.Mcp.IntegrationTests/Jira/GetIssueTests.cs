@@ -27,7 +27,7 @@ public sealed class GetIssueTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        var issue = await client.GetIssueAsync("PROJ-123", null, TestContext.Current.CancellationToken);
+        var issue = await client.GetIssue("PROJ-123", null, TestContext.Current.CancellationToken);
 
         issue.Key.Should().Be("PROJ-123");
         issue.CustomFields.Should().ContainKey("customfield_10101");
@@ -46,7 +46,7 @@ public sealed class GetIssueTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await client.GetIssueAsync(
+        await client.GetIssue(
             "PROJ-123",
             ["summary", "status"],
             TestContext.Current.CancellationToken);
@@ -67,7 +67,7 @@ public sealed class GetIssueTests : IClassFixture<HttpClientTestFixture>
             jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        var issue = await client.GetIssueAsync("PROJ-123", null, TestContext.Current.CancellationToken);
+        var issue = await client.GetIssue("PROJ-123", null, TestContext.Current.CancellationToken);
 
         issue.Summary.Should().Be("CSV export");
         mock.GetMatchCount(request).Should().Be(1);
@@ -86,7 +86,7 @@ public sealed class GetIssueTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.GetIssueAsync("PROJ-123", null, TestContext.Current.CancellationToken))
+        await Awaiting(() => client.GetIssue("PROJ-123", null, TestContext.Current.CancellationToken))
             .Should()
             .ThrowAsync<AtlassianApiException>()
             .Where(error => error.StatusCode == status)
@@ -104,7 +104,7 @@ public sealed class GetIssueTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.GetIssueAsync("PROJ-123", null, TestContext.Current.CancellationToken))
+        await Awaiting(() => client.GetIssue("PROJ-123", null, TestContext.Current.CancellationToken))
             .Should()
             .ThrowAsync<AtlassianApiException>();
     }

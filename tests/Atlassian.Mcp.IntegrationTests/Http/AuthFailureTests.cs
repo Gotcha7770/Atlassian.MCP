@@ -28,7 +28,7 @@ public sealed class AuthFailureTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.CheckAvailabilityAsync(TestContext.Current.CancellationToken))
+        await Awaiting(() => client.CheckAvailability(TestContext.Current.CancellationToken))
             .Should()
             .ThrowAsync<AtlassianApiException>()
             .Where(error => error.System == AtlassianSystem.Jira)

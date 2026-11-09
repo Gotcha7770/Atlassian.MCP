@@ -22,12 +22,11 @@ public sealed class JiraClient : IJiraClient
         _logger = logger;
     }
 
-    public async Task CheckAvailabilityAsync(CancellationToken cancellationToken)
+    public async Task CheckAvailability(CancellationToken cancellationToken)
     {
-        _logger.LogDebug(
-            "{System}: {Operation} started",
-            AtlassianSystem.Jira,
-            nameof(CheckAvailabilityAsync));
+        using var scope = _logger.BeginScope("{System}: {Operation}", AtlassianSystem.Jira, nameof(CheckAvailability));
+
+        _logger.LogDebug("started");
 
         try
         {
@@ -35,35 +34,25 @@ public sealed class JiraClient : IJiraClient
         }
         catch (AtlassianApiException exception)
         {
-            _logger.LogError(
-                exception,
-                "{System}: {Operation} failed with {StatusCode}",
-                AtlassianSystem.Jira,
-                nameof(CheckAvailabilityAsync),
-                exception.StatusCode is { } status ? (int)status : null);
+            _logger.LogError(exception, "failed with {StatusCode}", exception.StatusCode);
 
             throw;
         }
 
-        _logger.LogInformation(
-            "{System}: {Operation} completed",
-            AtlassianSystem.Jira,
-            nameof(CheckAvailabilityAsync));
+        _logger.LogInformation("completed");
     }
 
-    public async Task<IssueResponse> GetIssueAsync(
+    public async Task<IssueResponse> GetIssue(
         string issueKey,
         IReadOnlyList<string>? fields,
         CancellationToken cancellationToken)
     {
-        var fieldsQuery = fields is { Count: > 0 } ? string.Join(",", fields) : "*all";
+        using var scope = _logger.BeginScope("{System}: {Operation}", AtlassianSystem.Jira, nameof(GetIssue));
 
-        _logger.LogDebug(
-            "{System}: {Operation} started",
-            AtlassianSystem.Jira,
-            nameof(GetIssueAsync));
+        _logger.LogDebug("started");
 
         Issue? issue;
+        var fieldsQuery = fields is { Count: > 0 } ? string.Join(",", fields) : "*all";
 
         try
         {
@@ -71,20 +60,12 @@ public sealed class JiraClient : IJiraClient
         }
         catch (AtlassianApiException exception)
         {
-            _logger.LogError(
-                exception,
-                "{System}: {Operation} failed with {StatusCode}",
-                AtlassianSystem.Jira,
-                nameof(GetIssueAsync),
-                exception.StatusCode is { } status ? (int)status : null);
+            _logger.LogError(exception, "failed with {StatusCode}", exception.StatusCode);
 
             throw;
         }
 
-        _logger.LogInformation(
-            "{System}: {Operation} completed",
-            AtlassianSystem.Jira,
-            nameof(GetIssueAsync));
+        _logger.LogInformation("completed");
 
         if (issue is null)
         {
@@ -97,21 +78,20 @@ public sealed class JiraClient : IJiraClient
         return IssueMapper.ToDetails(issue);
     }
 
-    public async Task<IssueSearchResponse> SearchIssuesAsync(
+    public async Task<IssueSearchResponse> SearchIssues(
         string jql,
         int startAt,
         int maxResults,
         IReadOnlyList<string>? fields,
         CancellationToken cancellationToken)
     {
+        using var scope = _logger.BeginScope("{System}: {Operation}", AtlassianSystem.Jira, nameof(SearchIssues));
+
         string fieldsQuery = fields is { Count: > 0 }
             ? string.Join(",", fields)
             : "summary,status,issuetype,project";
 
-        _logger.LogDebug(
-            "{System}: {Operation} started",
-            AtlassianSystem.Jira,
-            nameof(SearchIssuesAsync));
+        _logger.LogDebug("started");
 
         ApiResponse<IssueSearchPage> response;
 
@@ -121,12 +101,7 @@ public sealed class JiraClient : IJiraClient
         }
         catch (AtlassianApiException exception)
         {
-            _logger.LogError(
-                exception,
-                "{System}: {Operation} failed with {StatusCode}",
-                AtlassianSystem.Jira,
-                nameof(SearchIssuesAsync),
-                exception.StatusCode is { } status ? (int)status : null);
+            _logger.LogError(exception, "failed with {StatusCode}", exception.StatusCode);
 
             throw;
         }
@@ -143,10 +118,7 @@ public sealed class JiraClient : IJiraClient
 
             IssueSearchResponse mappedResponse = IssueSearchMapper.ToResponse(response.Content);
 
-            _logger.LogInformation(
-                "{System}: {Operation} completed",
-                AtlassianSystem.Jira,
-                nameof(SearchIssuesAsync));
+            _logger.LogInformation("completed");
 
             return mappedResponse;
         }

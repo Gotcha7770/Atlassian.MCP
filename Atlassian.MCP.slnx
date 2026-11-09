@@ -1,16 +1,15 @@
 <Solution>
-  <Project Path="Atlassian.Mcp.Core/Atlassian.Mcp.Core.csproj" />
-  <Project Path="Atlassian.Mcp.Infrastructure/Atlassian.Mcp.Infrastructure.csproj" />
-  <Project Path="Atlassian.MCP.Server/Atlassian.MCP.Server.csproj" />
-  <Folder Name="/tests/">
-    <Project Path="tests/Atlassian.Mcp.Tests/Atlassian.Mcp.Tests.csproj" />
-    <Project Path="tests/Atlassian.Mcp.IntegrationTests/Atlassian.Mcp.IntegrationTests.csproj" />
-  </Folder>
-  <Folder Name="/SolutionItems/">
-    <File Path=".editorconfig" />
-    <File Path=".gitignore" />
-    <File Path="AGENTS.md" />
-    <File Path="opencode.json" />
-    <File Path="README.md" />
-  </Folder>
+	<Project Path="Atlassian.Mcp.Core/Atlassian.Mcp.Core.csproj"/>
+	<Project Path="Atlassian.Mcp.Infrastructure/Atlassian.Mcp.Infrastructure.csproj"/>
+	<Project Path="Atlassian.MCP.Server/Atlassian.MCP.Server.csproj"/>
+	<Folder Name="/tests/">
+		<Project Path="tests/Atlassian.Mcp.Tests/Atlassian.Mcp.Tests.csproj"/>
+		<Project Path="tests/Atlassian.Mcp.IntegrationTests/Atlassian.Mcp.IntegrationTests.csproj"/>
+	</Folder>
+	<Folder Name="/SolutionItems/">
+		<File Path=".editorconfig"/>
+		<File Path=".gitignore"/>
+		<File Path="AGENTS.md"/>
+		<File Path="README.md"/>
+	</Folder>
 </Solution>

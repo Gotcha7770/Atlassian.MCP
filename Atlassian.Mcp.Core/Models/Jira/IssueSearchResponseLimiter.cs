@@ -14,17 +14,13 @@ public static class IssueSearchResponseLimiter
             .Select(issue =>
             {
                 var fields = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
-                var truncatedFields = new List<TruncatedField>(issue.TruncatedFields);
+                var truncatedFields = new List<string>(issue.TruncatedFields);
 
                 foreach (KeyValuePair<string, JsonElement> field in issue.Fields)
                 {
                     if (fields.Count == ResponseLimiter.MaxItems)
                     {
-                        truncatedFields.Add(new TruncatedField
-                        {
-                            Name = field.Key,
-                            Reason = "field-count-limit"
-                        });
+                        truncatedFields.Add(field.Key);
                         continue;
                     }
 
@@ -37,11 +33,7 @@ public static class IssueSearchResponseLimiter
 
                         if (limitedValue.Length < originalValue.Length)
                         {
-                            truncatedFields.Add(new TruncatedField
-                            {
-                                Name = field.Key,
-                                Reason = "value-size-limit"
-                            });
+                            truncatedFields.Add(field.Key);
                         }
 
                         string json = JsonSerializer.Serialize(limitedValue);
@@ -53,11 +45,7 @@ public static class IssueSearchResponseLimiter
                     string rawValue = value.GetRawText();
                     if (rawValue.Utf8Length > ResponseLimiter.MaxCustomFieldBytes)
                     {
-                        truncatedFields.Add(new TruncatedField
-                        {
-                            Name = field.Key,
-                            Reason = "value-size-limit"
-                        });
+                        truncatedFields.Add(field.Key);
                         continue;
                     }
 

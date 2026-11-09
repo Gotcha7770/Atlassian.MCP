@@ -31,7 +31,7 @@ public sealed class JiraTools
             throw new McpException(ToolMessages.IssueKeyRequired);
         }
 
-        var issue = await _client.GetIssueAsync(issueKey, fields, cancellationToken);
+        var issue = await _client.GetIssue(issueKey, fields, cancellationToken);
 
         return IssueResponseLimiter.Limit(issue);
     }
@@ -65,7 +65,7 @@ public sealed class JiraTools
 
         try
         {
-            response = await _client.SearchIssuesAsync(
+            response = await _client.SearchIssues(
                 jql,
                 startAt,
                 maxResults,

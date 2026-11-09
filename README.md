@@ -101,15 +101,9 @@ MCP client configuration then runs the installed command instead of the project:
   "mcp": {
     "servers": {
       "atlassian": {
-        "type": "local",
+        ...
         "command": ["atlassian-mcp"],
-        "environment": {
-          "ATLASSIAN_JIRA_URL": "https://jira.example.com/jira",
-          "ATLASSIAN_JIRA_PAT": "<jira-pat>",
-          "ATLASSIAN_CONFLUENCE_URL": "https://confluence.example.com/wiki",
-          "ATLASSIAN_CONFLUENCE_PAT": "<confluence-pat>"
-        },
-        "enabled": true
+        ...
       }
     }
   }

@@ -10,13 +10,13 @@ public interface IJiraClient
     /// <summary>
     /// Проверяет доступность Jira и валидность Personal Access Token.
     /// </summary>
-    Task CheckAvailabilityAsync(CancellationToken cancellationToken);
+    Task CheckAvailability(CancellationToken cancellationToken);
 
     /// <summary>
     /// Возвращает задачу по ключу. Без списка полей запрашиваются все поля,
     /// включая пользовательские.
     /// </summary>
-    Task<IssueResponse> GetIssueAsync(
+    Task<IssueResponse> GetIssue(
         string issueKey,
         IReadOnlyList<string>? fields,
         CancellationToken cancellationToken);
@@ -24,7 +24,7 @@ public interface IJiraClient
     /// <summary>
     /// Ищет доступные задачи по JQL и возвращает одну страницу динамических полей.
     /// </summary>
-    Task<IssueSearchResponse> SearchIssuesAsync(
+    Task<IssueSearchResponse> SearchIssues(
         string jql,
         int startAt,
         int maxResults,

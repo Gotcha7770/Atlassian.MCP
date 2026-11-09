@@ -221,9 +221,9 @@ public sealed class JiraGetIssueContractTests
 
         public int Calls { get; private set; }
 
-        public Task CheckAvailabilityAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task CheckAvailability(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public Task<IssueResponse> GetIssueAsync(
+        public Task<IssueResponse> GetIssue(
             string issueKey,
             IReadOnlyList<string>? fields,
             CancellationToken cancellationToken)
@@ -237,7 +237,7 @@ public sealed class JiraGetIssueContractTests
             });
         }
 
-        public Task<IssueSearchResponse> SearchIssuesAsync(
+        public Task<IssueSearchResponse> SearchIssues(
             string jql,
             int startAt,
             int maxResults,
@@ -263,14 +263,14 @@ public sealed class JiraGetIssueContractTests
 
         public ThrowingJiraClient(AtlassianApiException exception) => _exception = exception;
 
-        public Task CheckAvailabilityAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task CheckAvailability(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public Task<IssueResponse> GetIssueAsync(
+        public Task<IssueResponse> GetIssue(
             string issueKey,
             IReadOnlyList<string>? fields,
             CancellationToken cancellationToken) => Task.FromException<IssueResponse>(_exception);
 
-        public Task<IssueSearchResponse> SearchIssuesAsync(
+        public Task<IssueSearchResponse> SearchIssues(
             string jql,
             int startAt,
             int maxResults,

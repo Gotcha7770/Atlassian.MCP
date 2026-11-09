@@ -23,7 +23,7 @@ public sealed class ContextPathTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await client.CheckAvailabilityAsync(TestContext.Current.CancellationToken);
+        await client.CheckAvailability(TestContext.Current.CancellationToken);
 
         mock.GetMatchCount(request).Should().Be(1);
     }
@@ -62,7 +62,7 @@ public sealed class ContextPathTests : IClassFixture<HttpClientTestFixture>
             jiraHandler: mock,
             confluenceHandler: mock);
 
-        await provider.GetRequiredService<IJiraClient>().CheckAvailabilityAsync(TestContext.Current.CancellationToken);
+        await provider.GetRequiredService<IJiraClient>().CheckAvailability(TestContext.Current.CancellationToken);
         await provider.GetRequiredService<IConfluenceClient>()
             .CheckAvailabilityAsync(TestContext.Current.CancellationToken);
 

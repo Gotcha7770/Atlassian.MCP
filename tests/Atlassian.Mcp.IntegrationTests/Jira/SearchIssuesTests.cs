@@ -58,7 +58,7 @@ public sealed class SearchIssuesTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(options, jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        var result = await client.SearchIssuesAsync(
+        var result = await client.SearchIssues(
             jql,
             0,
             20,
@@ -123,7 +123,7 @@ public sealed class SearchIssuesTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(options, jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        var result = await client.SearchIssuesAsync(
+        var result = await client.SearchIssues(
             jql,
             4,
             10,
@@ -163,7 +163,7 @@ public sealed class SearchIssuesTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(options, jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.SearchIssuesAsync(
+        await Awaiting(() => client.SearchIssues(
                 jql,
                 0,
                 20,
@@ -200,7 +200,7 @@ public sealed class SearchIssuesTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(options, jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.SearchIssuesAsync(
+        await Awaiting(() => client.SearchIssues(
                 jql,
                 0,
                 20,
@@ -237,7 +237,7 @@ public sealed class SearchIssuesTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(options, jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.SearchIssuesAsync(
+        await Awaiting(() => client.SearchIssues(
                 jql,
                 0,
                 20,
@@ -269,7 +269,7 @@ public sealed class SearchIssuesTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(options, jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.SearchIssuesAsync(
+        await Awaiting(() => client.SearchIssues(
                 "project = PROJ",
                 0,
                 20,
@@ -301,7 +301,7 @@ public sealed class SearchIssuesTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(options, jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.SearchIssuesAsync(
+        await Awaiting(() => client.SearchIssues(
                 "project = PROJ",
                 0,
                 20,
@@ -334,7 +334,7 @@ public sealed class SearchIssuesTests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(options, jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        var result = await client.SearchIssuesAsync(
+        var result = await client.SearchIssues(
             "project = PROJ",
             0,
             20,

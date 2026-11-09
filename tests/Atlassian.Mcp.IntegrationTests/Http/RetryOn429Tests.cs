@@ -48,7 +48,7 @@ public sealed class RetryOn429Tests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await client.CheckAvailabilityAsync(TestContext.Current.CancellationToken);
+        await client.CheckAvailability(TestContext.Current.CancellationToken);
 
         mock.GetMatchCount(request).Should().Be(2);
     }
@@ -74,7 +74,7 @@ public sealed class RetryOn429Tests : IClassFixture<HttpClientTestFixture>
         await using var provider = _fixture.CreateProvider(CreateOptions(), jiraHandler: mock);
         var client = provider.GetRequiredService<IJiraClient>();
 
-        await Awaiting(() => client.CheckAvailabilityAsync(TestContext.Current.CancellationToken))
+        await Awaiting(() => client.CheckAvailability(TestContext.Current.CancellationToken))
             .Should()
             .ThrowAsync<AtlassianApiException>()
             .Where(error => error.StatusCode == HttpStatusCode.TooManyRequests);

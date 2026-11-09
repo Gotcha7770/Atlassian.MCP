@@ -44,17 +44,13 @@ public sealed class IssueSearchResponseLimiterTests
                 issue.Key.Should().Be("PROJ-145");
                 string? limitedDescription = issue.Fields["description"].GetString();
                 limitedDescription.Should().NotBeNull();
-                limitedDescription!.Length.Should().BeLessThan(description.Length);
+                limitedDescription.Length.Should().BeLessThan(description.Length);
                 limitedDescription.Utf8Length.Should()
                     .BeLessThanOrEqualTo(ResponseLimiter.MaxTextBytes);
                 issue.TruncatedFields.Should()
                     .ContainSingle()
                     .Which.Should()
-                    .Satisfy<TruncatedField>(truncatedField =>
-                    {
-                        truncatedField.Name.Should().Be("description");
-                        truncatedField.Reason.Should().Be("value-size-limit");
-                    });
+                    .Be("description");
             });
 
         limited.StartAt.Should().Be(12);
@@ -105,11 +101,7 @@ public sealed class IssueSearchResponseLimiterTests
                 issue.TruncatedFields.Should()
                     .ContainSingle()
                     .Which.Should()
-                    .Satisfy<TruncatedField>(truncatedField =>
-                    {
-                        truncatedField.Name.Should().Be("customfield_14002");
-                        truncatedField.Reason.Should().Be("value-size-limit");
-                    });
+                    .Be("customfield_14002");
             });
         limited.HasMore.Should().BeFalse();
         limited.NextStartAt.Should().BeNull();
@@ -156,11 +148,7 @@ public sealed class IssueSearchResponseLimiterTests
                 issue.TruncatedFields.Should()
                     .ContainSingle()
                     .Which.Should()
-                    .Satisfy<TruncatedField>(truncatedField =>
-                    {
-                        truncatedField.Name.Should().Be("customfield_100");
-                        truncatedField.Reason.Should().Be("field-count-limit");
-                    });
+                    .Be("customfield_100");
                 issue.Key.Should().Be("PROJ-147");
             });
         limited.StartAt.Should().Be(5);

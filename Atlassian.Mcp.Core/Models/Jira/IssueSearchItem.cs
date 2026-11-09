@@ -10,5 +10,5 @@ public sealed record IssueSearchItem
     public required string Key { get; init; }
     public string? Id { get; init; }
     public Dictionary<string, JsonElement> Fields { get; init; } = [];
-    public IReadOnlyList<TruncatedField> TruncatedFields { get; init; } = [];
+    public IReadOnlyList<string> TruncatedFields { get; init; } = [];
 }

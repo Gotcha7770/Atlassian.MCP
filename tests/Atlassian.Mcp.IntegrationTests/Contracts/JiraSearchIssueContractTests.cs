@@ -209,17 +209,13 @@ public sealed class JiraSearchIssueContractTests
         string? returnedDescription = issue.Fields["description"].GetString();
 
         returnedDescription.Should().NotBeNull();
-        returnedDescription!.Length.Should().BeLessThan(description.Length);
+        returnedDescription.Length.Should().BeLessThan(description.Length);
         returnedDescription.Utf8Length.Should().BeLessThanOrEqualTo(ResponseLimiter.MaxTextBytes);
         issue.Key.Should().Be("PROJ-143");
         issue.TruncatedFields.Should()
             .ContainSingle()
             .Which.Should()
-            .Satisfy<TruncatedField>(truncatedField =>
-            {
-                truncatedField.Name.Should().Be("description");
-                truncatedField.Reason.Should().Be("value-size-limit");
-            });
+            .Be("description");
         result.HasMore.Should().BeTrue();
         result.NextStartAt.Should().Be(4);
     }
@@ -268,9 +264,9 @@ public sealed class JiraSearchIssueContractTests
 
         public int SearchCalls { get; private set; }
 
-        public Task CheckAvailabilityAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task CheckAvailability(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public Task<IssueResponse> GetIssueAsync(
+        public Task<IssueResponse> GetIssue(
             string issueKey,
             IReadOnlyList<string>? fields,
             CancellationToken cancellationToken)
@@ -278,7 +274,7 @@ public sealed class JiraSearchIssueContractTests
             throw new NotSupportedException();
         }
 
-        public Task<IssueSearchResponse> SearchIssuesAsync(
+        public Task<IssueSearchResponse> SearchIssues(
             string jql,
             int startAt,
             int maxResults,
@@ -299,9 +295,9 @@ public sealed class JiraSearchIssueContractTests
 
         public int SearchCalls { get; private set; }
 
-        public Task CheckAvailabilityAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task CheckAvailability(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public Task<IssueResponse> GetIssueAsync(
+        public Task<IssueResponse> GetIssue(
             string issueKey,
             IReadOnlyList<string>? fields,
             CancellationToken cancellationToken)
@@ -309,7 +305,7 @@ public sealed class JiraSearchIssueContractTests
             throw new NotSupportedException();
         }
 
-        public Task<IssueSearchResponse> SearchIssuesAsync(
+        public Task<IssueSearchResponse> SearchIssues(
             string jql,
             int startAt,
             int maxResults,
