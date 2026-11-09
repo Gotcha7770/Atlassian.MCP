@@ -1,13 +1,13 @@
 # Atlassian MCP Server
 
-Read-only MCP server for Jira and Confluence. Transport is STDIO; the first version provides
+MCP server for Jira and Confluence. Transport is STDIO; the first version provides
 read operations only.
 
 The current version supports Jira Data Center 10.x and Confluence Data Center 8.x.
 
 ## Requirements
 
-- .NET SDK 10.0 (`global.json`)
+- .NET Runtime 10.0
 - MCP client with STDIO support
 
 ## Configuration
@@ -28,14 +28,14 @@ values.
 
 ## Build and test
 
-```powershell
+```shell
 dotnet build
 dotnet test
 ```
 
 ## Running
 
-```powershell
+```shell
 dotnet run --project Atlassian.MCP.Server
 ```
 
@@ -44,7 +44,7 @@ console.
 
 ### OpenCode v2
 
-`opencode.json` in the repository root:
+add to local or user `opencode.json` for setting mcp:
 
 ```json
 {
@@ -72,21 +72,15 @@ console.
 The server is packed as a .NET tool and can be distributed through a local NuGet feed.
 The .NET 10 runtime is a prerequisite.
 
-Pack the tool from the repository root:
+Pack the tool from the repository root to local feed:
 
-```powershell
-dotnet pack Atlassian.MCP.Server -c Release -o artifacts
+```shell
+dotnet pack Atlassian.MCP.Server -c Release -o <path-to-local-feed>
 ```
 
-Register the feed once, so that `dotnet tool` can see the package:
+Install or update the tool (`-g` is for global):
 
-```powershell
-dotnet nuget add source <path-to-repo>\artifacts -n atlassian-mcp
-```
-
-Install or update the tool:
-
-```powershell
+```shell
 dotnet tool install -g Atlassian.MCP.Server
 dotnet tool update -g Atlassian.MCP.Server
 ```
@@ -115,7 +109,7 @@ MCP client configuration then runs the installed command instead of the project:
 | Tool | Status |
 | --- | --- |
 | `jiraGetIssue` | implemented |
-| `jiraSearchIssues` | in development |
+| `jiraSearchIssues` | implemented |
 | `jiraGetProject` | in development |
 | `confluenceSearch` | in development |
 | `confluenceGetPage` | in development |
