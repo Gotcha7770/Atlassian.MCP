@@ -14,5 +14,11 @@ public static class ToolMessages
 
     public static string IssueKeyRequired => Get("IssueKeyRequired");
 
+    public static string JqlRequired => Get("JqlRequired");
+
+    public static string SearchStartAtNonNegative => Get("SearchStartAtNonNegative");
+
+    public static string SearchMaxResultsOutOfRange => Get("SearchMaxResultsOutOfRange");
+
     private static string Get(string key) => Resources.GetString(key, CultureInfo.CurrentUICulture) ?? key;
 }

@@ -20,4 +20,14 @@ public interface IJiraClient
         string issueKey,
         IReadOnlyList<string>? fields,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Ищет доступные задачи по JQL и возвращает одну страницу динамических полей.
+    /// </summary>
+    Task<IssueSearchResponse> SearchIssuesAsync(
+        string jql,
+        int startAt,
+        int maxResults,
+        IReadOnlyList<string>? fields,
+        CancellationToken cancellationToken);
 }

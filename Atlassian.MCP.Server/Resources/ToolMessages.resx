@@ -15,4 +15,13 @@
   <data name="IssueKeyRequired" xml:space="preserve">
     <value>issueKey is required.</value>
   </data>
+  <data name="JqlRequired" xml:space="preserve">
+    <value>jql is required.</value>
+  </data>
+  <data name="SearchStartAtNonNegative" xml:space="preserve">
+    <value>startAt must be greater than or equal to 0.</value>
+  </data>
+  <data name="SearchMaxResultsOutOfRange" xml:space="preserve">
+    <value>maxResults must be between 1 and 50.</value>
+  </data>
 </root>

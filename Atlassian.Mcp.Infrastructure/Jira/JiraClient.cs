@@ -4,6 +4,7 @@ using Atlassian.Mcp.Core.Models.Jira;
 using Atlassian.Mcp.Infrastructure.Configuration;
 using Atlassian.Mcp.Infrastructure.Jira.Models;
 using Microsoft.Extensions.Logging;
+using Refit;
 
 namespace Atlassian.Mcp.Infrastructure.Jira;
 
@@ -94,5 +95,60 @@ public sealed class JiraClient : IJiraClient
         }
 
         return IssueMapper.ToDetails(issue);
+    }
+
+    public async Task<IssueSearchResponse> SearchIssuesAsync(
+        string jql,
+        int startAt,
+        int maxResults,
+        IReadOnlyList<string>? fields,
+        CancellationToken cancellationToken)
+    {
+        string fieldsQuery = fields is { Count: > 0 }
+            ? string.Join(",", fields)
+            : "summary,status,issuetype,project";
+
+        _logger.LogDebug(
+            "{System}: {Operation} started",
+            AtlassianSystem.Jira,
+            nameof(SearchIssuesAsync));
+
+        ApiResponse<IssueSearchPage> response;
+
+        try
+        {
+            response = await _api.SearchIssues(jql, startAt, maxResults, fieldsQuery, cancellationToken);
+        }
+        catch (AtlassianApiException exception)
+        {
+            _logger.LogError(
+                exception,
+                "{System}: {Operation} failed with {StatusCode}",
+                AtlassianSystem.Jira,
+                nameof(SearchIssuesAsync),
+                exception.StatusCode is { } status ? (int)status : null);
+
+            throw;
+        }
+
+        using (response)
+        {
+            if (response.Content is null)
+            {
+                throw new AtlassianApiException(
+                    AtlassianSystem.Jira,
+                    response.StatusCode,
+                    $"{AtlassianSystem.Jira}: {ErrorMessages.EmptyResponse}");
+            }
+
+            IssueSearchResponse mappedResponse = IssueSearchMapper.ToResponse(response.Content);
+
+            _logger.LogInformation(
+                "{System}: {Operation} completed",
+                AtlassianSystem.Jira,
+                nameof(SearchIssuesAsync));
+
+            return mappedResponse;
+        }
     }
 }
