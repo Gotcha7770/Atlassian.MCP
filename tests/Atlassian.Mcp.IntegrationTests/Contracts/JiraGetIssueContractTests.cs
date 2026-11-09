@@ -236,6 +236,25 @@ public sealed class JiraGetIssueContractTests
                 Description = Description
             });
         }
+
+        public Task<IssueSearchResponse> SearchIssuesAsync(
+            string jql,
+            int startAt,
+            int maxResults,
+            IReadOnlyList<string>? fields,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult(new IssueSearchResponse
+            {
+                StartAt = startAt,
+                MaxResults = maxResults,
+                Total = 0,
+                ReturnedCount = 0,
+                HasMore = false,
+                NextStartAt = null,
+                Issues = []
+            });
+        }
     }
 
     private sealed class ThrowingJiraClient : IJiraClient
@@ -250,6 +269,12 @@ public sealed class JiraGetIssueContractTests
             string issueKey,
             IReadOnlyList<string>? fields,
             CancellationToken cancellationToken) => Task.FromException<IssueResponse>(_exception);
+
+        public Task<IssueSearchResponse> SearchIssuesAsync(
+            string jql,
+            int startAt,
+            int maxResults,
+            IReadOnlyList<string>? fields,
+            CancellationToken cancellationToken) => Task.FromException<IssueSearchResponse>(_exception);
     }
 }
-

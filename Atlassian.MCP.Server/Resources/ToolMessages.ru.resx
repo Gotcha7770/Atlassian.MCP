@@ -15,4 +15,13 @@
   <data name="IssueKeyRequired" xml:space="preserve">
     <value>параметр issueKey обязателен.</value>
   </data>
+  <data name="JqlRequired" xml:space="preserve">
+    <value>параметр jql обязателен.</value>
+  </data>
+  <data name="SearchStartAtNonNegative" xml:space="preserve">
+    <value>параметр startAt должен быть неотрицательным.</value>
+  </data>
+  <data name="SearchMaxResultsOutOfRange" xml:space="preserve">
+    <value>параметр maxResults должен быть в диапазоне от 1 до 50.</value>
+  </data>
 </root>

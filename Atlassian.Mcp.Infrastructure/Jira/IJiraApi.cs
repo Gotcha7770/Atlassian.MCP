@@ -17,4 +17,12 @@ public interface IJiraApi
         string issueKey,
         [Query] string? fields,
         CancellationToken cancellationToken);
+
+    [Get("/rest/api/2/search")]
+    Task<ApiResponse<IssueSearchPage>> SearchIssues(
+        [Query] string jql,
+        [Query] int startAt,
+        [Query] int maxResults,
+        [Query] string fields,
+        CancellationToken cancellationToken);
 }
